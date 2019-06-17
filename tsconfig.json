@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
@@ -9,13 +10,19 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es2015",
-    "module": "esnext",
+    "module": "es2015",
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2017", "dom"],
+    "lib": ["es2018", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@prot/formly/prot-formly": [
+        "libs/formly/prot-formly/src/index.ts"
+      ],
+      "@prot/prot-formly": ["libs/prot-formly/src/index.ts"],
+      "@prot/data/service": ["libs/data/service/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

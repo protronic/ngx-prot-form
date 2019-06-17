@@ -1,5 +1,5 @@
 {
-  "npmScope": "prot-formly-test2",
+  "npmScope": "prot",
   "implicitDependencies": {
     "angular.json": "*",
     "package.json": "*",
@@ -12,6 +12,15 @@
       "tags": []
     },
     "prot-formly-test2": {
+      "tags": []
+    },
+    "formly-prot-formly": {
+      "tags": []
+    },
+    "prot-formly": {
+      "tags": []
+    },
+    "data-service": {
       "tags": []
     }
   }

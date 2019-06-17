@@ -1,0 +1,7 @@
+{
+  "extends": "../../../tslint.json",
+  "rules": {
+    "directive-selector": [true, "attribute", "protFormlyTest2", "camelCase"],
+    "component-selector": [true, "element", "prot-formly-test2", "kebab-case"]
+  }
+}

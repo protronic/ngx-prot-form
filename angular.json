@@ -26,8 +26,14 @@
               "apps/prot-formly-test2/src/favicon.ico",
               "apps/prot-formly-test2/src/assets"
             ],
-            "styles": ["apps/prot-formly-test2/src/styles.scss"],
-            "scripts": []
+            "styles": [
+              "apps/prot-formly-test2/src/styles.scss"
+            ],
+            "scripts": [
+              {
+                "input": "node_modules/document-register-element/build/document-register-element.js"
+              }
+            ]
           },
           "configurations": {
             "production": {
@@ -80,7 +86,9 @@
               "apps/prot-formly-test2/tsconfig.app.json",
               "apps/prot-formly-test2/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**"]
+            "exclude": [
+              "**/node_modules/**"
+            ]
           }
         },
         "test": {
@@ -115,6 +123,99 @@
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
             "tsConfig": "apps/prot-formly-test2-e2e/tsconfig.e2e.json"
+          }
+        }
+      }
+    },
+    "formly-prot-formly": {
+      "projectType": "library",
+      "root": "libs/formly/prot-formly",
+      "sourceRoot": "libs/formly/prot-formly/src",
+      "prefix": "prot-formly-test2",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/formly/prot-formly/tsconfig.lib.json",
+              "libs/formly/prot-formly/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/formly/prot-formly/jest.config.js",
+            "tsConfig": "libs/formly/prot-formly/tsconfig.spec.json",
+            "setupFile": "libs/formly/prot-formly/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {
+        "@nrwl/angular:component": {
+          "styleext": "scss"
+        }
+      }
+    },
+    "prot-formly": {
+      "projectType": "library",
+      "root": "libs/prot-formly",
+      "sourceRoot": "libs/prot-formly/src",
+      "prefix": "prot-formly-test2",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/prot-formly/tsconfig.lib.json",
+              "libs/prot-formly/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/prot-formly/jest.config.js",
+            "tsConfig": "libs/prot-formly/tsconfig.spec.json",
+            "setupFile": "libs/prot-formly/src/test-setup.ts"
+          }
+        }
+      },
+      "schematics": {
+        "@nrwl/angular:component": {
+          "styleext": "scss"
+        }
+      }
+    },
+    "data-service": {
+      "root": "libs/data/service",
+      "sourceRoot": "libs\\data\\service\\src",
+      "projectType": "library",
+      "schematics": {},
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs\\data\\service\\tsconfig.lib.json",
+              "libs/data/service/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/data/service/jest.config.js",
+            "tsConfig": "libs/data/service/tsconfig.spec.json"
           }
         }
       }
