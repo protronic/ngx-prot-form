@@ -22,6 +22,12 @@
     },
     "data-service": {
       "tags": []
+    },
+    "prot-formly-schema-editor-e2e": {
+      "tags": []
+    },
+    "prot-formly-schema-editor": {
+      "tags": []
     }
   }
 }
