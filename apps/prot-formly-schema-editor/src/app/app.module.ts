@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AceModule, AceConfigInterface, ACE_CONFIG } from 'ngx-ace-wrapper';
 
-import { ProtFormlyModule } from 'libs/prot-formly/src';
+import { ProtFormlyModule } from '@prot/prot-formly';
 import { ProtFormlyWrapperComponent } from './prot-formly-wrapper/prot.formly.wrapper.component';
 
 import { AppComponent } from './app.component';

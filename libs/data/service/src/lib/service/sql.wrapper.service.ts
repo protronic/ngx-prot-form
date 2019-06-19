@@ -10,12 +10,6 @@ export class SqlWrapperServiceConfig {
 export class SqlWrapperService {
 
   private _endpointUrl: string = 'http://prot-subuntu:8081/formly';
-  private mapDBNames = (dbName: string): {table: string, view: string} => {
-    if(dbName === 'http://prot-subuntu:5985/ang-formly-schemata')
-      return {table: 'schema', view: 'schemadetails'};
-    if(dbName === 'http://prot-subuntu:5985/ausgefuellte_formulare')
-      return {table: 'model', view: 'modeldetails'};
-  }
 
   constructor(@Optional() config: SqlWrapperServiceConfig) {
     if (config) { this._endpointUrl = config.enpointUrl }
@@ -81,13 +75,9 @@ export class SqlWrapperService {
     })
   }
 
-  newPouchDB(name: string): any {
-    return {name: name};
-  }
-
-  async get(db: any, docName: string): Promise<any> {
-    console.log({sqlGet: [docName, this.mapDBNames(db.name).view]});
-    return this.getDocument(docName, this.mapDBNames(db.name).view)
+  async get(table: string, docName: string): Promise<any> {
+    console.log({sqlGet: [docName, table]});
+    return this.getDocument(docName, table)
       .then( (response) => (response.json()))
       .then( (response) => {
         console.log({sqlGetResponse: response && response.recordset ? JSON.parse(response.recordset[0].log) : undefined});
@@ -96,28 +86,28 @@ export class SqlWrapperService {
       .catch( err => (console.error(err), undefined));
   }
 
-  async put(db: any, model: any): Promise<any>{
-    console.log({sqlPut: [model, this.mapDBNames(db.name).table]});
+  async put(table: string, model: any): Promise<any>{
+    console.log({sqlPut: [model, table]});
 
-    return this.get(db, model['modelKey'])
+    return this.get(table, model['modelKey'])
       .then( response => {
         if(response === undefined){
           // insert
-          this.insertDocument(JSON.stringify(model), this.mapDBNames(db.name).table)
+          this.insertDocument(JSON.stringify(model), table)
             .then( (response) => (response.json()))
             .then( (response) => {
               console.log({sqlPutResponseInsert: response});
-              // TODO: braucht erfolgsbewertung -> response.rowsAffected = [1, 1]
+              console.error('TODO: insert braucht erfolgsbewertung -> response.rowsAffected = [1, 1] / Misserfolgsbehandlung');
               return response;
             });
         }
         else{
           // update
-          this.updateDocument(JSON.stringify(model), this.mapDBNames(db.name).table, model["modelKey"])
+          this.updateDocument(JSON.stringify(model), table, model["modelKey"])
             .then( (response) => (response.json()))
             .then( (response) => {
               console.log({sqlPutResponseUpdate: response});
-              // TODO: braucht erfolgsbewertung -> response.rowsAffected = [1, 1]
+              console.error('TODO: update braucht erfolgsbewertung -> response.rowsAffected = [1, 1] / Misserfolgsbehandlung');
               return response;
             });
         }
@@ -125,9 +115,9 @@ export class SqlWrapperService {
       .catch( err => (console.error(err), err));
   }
 
-  async find(db: any, fiVaMap: any): Promise<any>{
-    console.log({sqlFind: [fiVaMap, this.mapDBNames(db.name).view]});
-    return this.findDocuments(fiVaMap, this.mapDBNames(db.name).view)
+  async find(table: string, fiVaMap: any): Promise<any>{
+    console.log({sqlFind: [fiVaMap, table]});
+    return this.findDocuments(fiVaMap, table)
       .then( (response) => (response.json()))
       .then( (response) => (response && response.recordset ? response.recordset.map( value => (value._key) ) : []))
       .then( (response) => {

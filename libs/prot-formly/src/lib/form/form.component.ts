@@ -1,45 +1,46 @@
 import { Component, OnInit, OnChanges, ViewChild, ViewEncapsulation, Input, ElementRef, SimpleChanges } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { FormlyFieldConfig } from '@ngx-formly/core';
 import { DatabaseInteractionService } from 'libs/data/service/src';
 
+export interface WriteMode {
+  name: string,
+  submitLabel: string,
+  modeLabel: string, 
+  modeClass: any,
+  verifyMode: Function
+}
+
+export const AvailableModes: Array<WriteMode> = [
+  {
+    name: 'writeall', 
+    modeLabel: 'Belibiges Schreiben', 
+    submitLabel: 'Übertragen', 
+    modeClass: {'btn-primary': true, 'btn-secondary': false, 'btn-info': false},
+    verifyMode: (async (control) => (new Promise( resolve => { resolve(true) })))
+  },
+  {
+    name: 'overrideonly', 
+    modeLabel: 'Nur Bearbeiten', 
+    submitLabel: 'Überschreiben', 
+    modeClass: {'btn-primary': false, 'btn-secondary': true, 'btn-info': false},
+    verifyMode: (async (control) => {
+      let result = new Promise( resolve => (resolve()));
+      return result;
+    })
+  },
+  {
+    name: 'newonly', 
+    modeLabel: 'Nur Anlegen', 
+    submitLabel: 'Anlegen', 
+    modeClass: {'btn-primary': false, 'btn-secondary': false, 'btn-info': true},
+    verifyMode: (async (control) => (new Promise( resolve => { resolve(true) })))
+  }
+]
+
 @Component({
   selector: 'prot-form-component',
-  template: `
-  <div class="card" style="padding: 10px;">
-    <form #frm [formGroup]="form" (ngSubmit)="submit(modelDocument)">
-      <formly-form [form]="form" [fields]="fields" [model]="modelDocument"></formly-form>
-    </form>
-    <div>
-      <button 
-        type="submit" 
-        class="btn" 
-        [ngClass]="{
-          'btn-warning': btn === 'warning',
-          'btn-primary': btn === 'primary', 
-          'btn-danger': btn === 'danger', 
-          'btn-success': btn === 'success'}"
-        (click)="submit(modelDocument)"
-      >Absenden</button>
-      <button
-          style="margin-left: 10px;"
-          class="btn btn-danger"
-          [disabled]="previousModel === undefined"
-          (click)="revert(previousModel)"
-      >Rückgängig</button>
-    </div>
-    <!--
-    <div *ngIf="debug">
-      <hr>
-      <a [href]='modelLink' target='_parent' class="btn btn-outline-light" style="width: 100%; margin-bottom: 5px;">Modellink</a>
-      <br>
-      <a [href]='schemaLink' target='_parent' class="btn btn-outline-light" style="width: 100%; margin-bottom: 5px;">Schemalink</a>
-      <br>
-      <a [href]='historyLink' target='_parent' class="btn btn-outline-light" style="width: 100%; margin-bottom: 5px;">Historylink</a>
-    </div>
-    -->
-  </div>
-  `,
+  templateUrl: './form.component.html',
   // styles: [],
   styleUrls: [
     // './app.component.css',
@@ -65,13 +66,34 @@ export class FormComponent implements OnInit {
   fields: FormlyFieldConfig[] = [{}];
   searchableFields: Array<string>;
   listenersDefined: boolean = false;
-  modelLink: string = "http://prot-subuntu:5985/_utils/#database/ausgefuellte_formulare/";
-  schemaLink: string = "http://prot-subuntu:5985/_utils/#database/ang-formly-schemata/";
-  historyLink: string = "http://prot-subuntu:5985/_utils/#database/ausgefuellte_formulare_history/";
-  btn: string = 'primary';
   schemaPrimaryKey: string;
   modelKey: string;
   previousModel: object;
+
+  public autoAutoComplete: boolean = true;
+  private mode: WriteMode = AvailableModes[0];
+  public submitButtonConfig = {
+    label: this.mode.submitLabel, 
+    class: this.getSubmitButtonColorConfig('btn-primary'), 
+    disabled: false};
+  public modeButtonConfig = {
+    label: this.mode.modeLabel, 
+    class: this.mode.modeClass, 
+    disabled: false
+  };
+  public autoCompleteButtonConfig = {
+    label: this.autoAutoComplete ? 'Autocomplete Ausschalten' : 'Autocomplete Einschalten', 
+    class: {}, 
+    disabled: false
+  };
+
+  clearModel(){
+    
+    Object.keys(this.modelDocument).map( key => (this.form[key] = (this.modelDocument[key] instanceof Array) ? [] : '' ))
+    this.model = null;
+    this.modelDocument = {};
+    this.modelKey = undefined;
+  }
 
   formularChange(formular: string) {
     if (formular != ''){
@@ -85,6 +107,17 @@ export class FormComponent implements OnInit {
     }
   }
 
+  getSubmitButtonColorConfig(color: string){
+    let result = {
+      'btn-primary': false,
+      'btn-success': false,
+      'btn-danger': false,
+      'btn-warning': false,
+    };
+    result[color] = true;
+    return result;
+  }
+
   ngOnInit() {
     console.log(navigator['usb'])    
     if (this._formular != ''){
@@ -92,7 +125,6 @@ export class FormComponent implements OnInit {
         .then((val) => {
           this.fields = val['schema'];
           this.searchableFields = this.databaseInteractionService.getSearchableFields();
-          this.schemaLink += val['_id'];
           this.schemaPrimaryKey = val['primaryKey'];
           this.form.valueChanges.subscribe(
             (change) => {
@@ -117,9 +149,6 @@ export class FormComponent implements OnInit {
         .then(val => {
           this.modelDocument = val;
           console.log({val: val, primary: this.schemaPrimaryKey, res: val[this.schemaPrimaryKey]});
-          this.modelLink = `http://prot-subuntu:5985/_utils/#database/ausgefuellte_formulare/${this.modelDocument['_id']}`;
-          this.historyLink = `http://prot-subuntu:5985/_utils/#database/ausgefuellte_formulare_history/${this.modelDocument['_id']}`;
-          console.log(val)
         });
     }
   }
@@ -134,9 +163,9 @@ export class FormComponent implements OnInit {
             this.databaseInteractionService.getUniqueSearchable(this.searchableFields[i], change)
               .then( newModel => {
                 console.log(newModel);
-                this.modelDocument = newModel;
-                this.modelLink = `http://prot-subuntu:5985/_utils/#database/ausgefuellte_formulare/${this.modelDocument['_id']}`;
-                this.historyLink = `http://prot-subuntu:5985/_utils/#database/ausgefuellte_formulare_history/${this.modelDocument['_id']}`;
+                if (this.autoAutoComplete){
+                  this.modelDocument = newModel;
+                }
               })
               .catch( err => {
                 console.error(err);
@@ -163,7 +192,7 @@ export class FormComponent implements OnInit {
   sendData(model: object, submitButton: boolean) {
     if(this.form.valid){
       console.log({model: model});
-      this.btn = 'warning';
+      this.submitButtonConfig.class = this.getSubmitButtonColorConfig('btn-warning');
       this.databaseInteractionService.getModel(model['_id'])
         .then(old_doc => {
           // let old_rev = old_doc['_rev'];
@@ -189,15 +218,61 @@ export class FormComponent implements OnInit {
           return {new: model, old: {'_id': model['_id']}};
         })
         .then(models => {
-          return Promise.all([this.databaseInteractionService.saveModel(models.new), this.databaseInteractionService.saveHistory(models.old)]);
+          return Promise.all([this.databaseInteractionService.saveModel(models.new)]);
         })
         .then(val => {
-          this.btn = 'success';
+          this.submitButtonConfig.class = this.getSubmitButtonColorConfig('btn-success');
         })
         .catch(err => {
           console.error(err);
-          this.btn = 'danger';
+          this.submitButtonConfig.class = this.getSubmitButtonColorConfig('btn-danger');
         });
     }
+  }
+
+  replaceAsyncValidator(fn: Function){
+    let index;
+    let validator = this.fields[this.schemaPrimaryKey].asyncValidators.filter( (value, index, array) => (value.name === 'writemodeValidator'))[0];
+    if (validator) index = this.fields[this.schemaPrimaryKey].asyncValidators.indexOf(validator) 
+    else {
+      this.fields[this.schemaPrimaryKey].asyncValidators.push({name: 'writemodeValidator', validation: this.mode.verifyMode})
+      index = this.fields[this.schemaPrimaryKey].asyncValidators.length - 1
+    }
+
+    this.fields[this.schemaPrimaryKey].asyncValidators[index] = {
+      name: 'writemodeValidator',
+      validation: this.mode.verifyMode
+    }
+  }
+
+  // jump to mode
+
+
+  // cicle mode
+  changeMode(){
+    let oldMode = this.mode;
+    this.mode = AvailableModes[(AvailableModes.indexOf(oldMode) + 1) % (Object.keys(AvailableModes).length)];
+    this.updateModeData(this.mode, oldMode);
+  }
+
+  updateModeData(newMode: WriteMode, oldMode: WriteMode){    
+    this.submitButtonConfig.class = {
+      'btn-primary': true,
+      'btn-success': false,
+      'btn-danger': false,
+      'btn-warning': false,
+    }
+    this.submitButtonConfig.label = newMode.submitLabel;
+    this.submitButtonConfig.disabled = false;
+
+    this.modeButtonConfig.class = newMode.modeClass;
+    this.modeButtonConfig.label = newMode.modeLabel;
+    this.modeButtonConfig.disabled = false;
+
+    console.log('modechange', {from: oldMode, to: newMode});
+  }
+
+  toggleAutoComplete(){
+    this.autoAutoComplete = !this.autoAutoComplete;
   }
 }

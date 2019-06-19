@@ -5,32 +5,22 @@ import { SqlWrapperService } from './sql.wrapper.service';
   providedIn: 'root'
 })
 export class DatabaseInteractionService {
-  
-  private schemaDB: any;
-  private modelDB: any;
-
-  private linkInitiatedMap: object = {};
 
   private schemaDoc: object = {};
+  private essentialViews = ['modeldetails', 'schemadetails', 'seriennummervergabe', 'entwicklungsaufgabe'];
+  public essentialTables = ['model', 'schemas', 'history'].push(...this.essentialViews);
   
-  constructor(private pouchDBService: SqlWrapperService) {
-    
-    this.schemaDB = this.connectDatabase('http://prot-subuntu:5985/ang-formly-schemata');
-    this.modelDB = this.connectDatabase('http://prot-subuntu:5985/ausgefuellte_formulare');
-  }
+  private readonly schemaView = 'schemadetails';
+  private readonly schemaModel = 'schemas';
+  private readonly modelView = 'modeldetails';
+  private readonly modelDatabase = 'model';
 
-  connectDatabase(link: string): any | null {
-    if (this.linkInitiatedMap[link] === undefined){
-      this.linkInitiatedMap[link] = this.pouchDBService.newPouchDB(link);
-      return this.linkInitiatedMap[link];
-    }
-    else {
-      return this.linkInitiatedMap[link];
-    }
+  constructor(private sqlWrapperService: SqlWrapperService) {
+    
   }
 
   getSchema(schemaName: string): Promise<object>{
-    function replaceFunctionString(rootDoc){
+    function replaceFunctionString(rootDoc: any){
       for(let key in rootDoc){
         if (rootDoc[key].validators != undefined){
           for(let validator in rootDoc[key].validators){
@@ -51,11 +41,10 @@ export class DatabaseInteractionService {
     }
 
     return new Promise((resolve, reject) =>{
-      this.pouchDBService.get(this.schemaDB, schemaName)
+      this.sqlWrapperService.get(this.schemaView, schemaName)
         .then(val => {
           this.schemaDoc = val;
-          replaceFunctionString(val['schema']);
-          
+          replaceFunctionString(val['schema']);          
           console.log({schemaDoc: this.schemaDoc})
           resolve(val);
         })
@@ -78,16 +67,12 @@ export class DatabaseInteractionService {
         model['modelKey'] = `${this.schemaDoc['primaryKey']}-${model[this.schemaDoc['primaryKey']]}`;    
       }
       
-      console.log(this.pouchDBService.put(this.modelDB, model).then( value => (resolve(value))));
+      console.log(this.sqlWrapperService.put(this.modelDatabase, model).then( value => (resolve(value))));
     });
   }
-
-  saveHistory(old_model: any){
-    return new Promise( (resolve) => (resolve()));
-  }
-
+  
   getModel(modelDocument: string): Promise<object>{
-    return this.pouchDBService.get(this.modelDB, modelDocument);
+    return this.sqlWrapperService.get(this.modelView, modelDocument);
   }
 
   getSearchableFields(): Array<string>{
@@ -106,7 +91,7 @@ export class DatabaseInteractionService {
     return new Promise((resolve, reject) => {
       let fieldValueMap = [{field: field, value: value}]
 
-      this.pouchDBService.find(this.modelDB, fieldValueMap)
+      this.sqlWrapperService.find(this.modelView, fieldValueMap)
         .then( keyList => {
           if (keyList.length > 1){
             reject('search was ambiguous');

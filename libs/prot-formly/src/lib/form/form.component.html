@@ -1,0 +1,48 @@
+<div class="card" style="padding: 10px;">
+  <form #frm [formGroup]="form" (ngSubmit)="submit(modelDocument)">
+    <formly-form [form]="form" [fields]="fields" [model]="modelDocument"></formly-form>
+  </form>
+  <div class="buttonrow">
+    <button 
+      type="submit" 
+      class="btn submit" 
+      [ngClass]="submitButtonConfig.class"
+      [disabled]="submitButtonConfig.disabled"
+      (click)="submit(modelDocument)"
+    >{{submitButtonConfig.label}}</button>
+    <button
+      type="button"
+      class="btn mode"
+      [ngClass]="modeButtonConfig.class"
+      [disabled]="modeButtonConfig.disabled"
+      (click)="changeMode()"
+    >{{modeButtonConfig.label}}</button>
+    <button
+      class="btn btn-danger back"
+      [disabled]="previousModel === undefined"
+      (click)="revert(previousModel)"
+    >Rückgängig</button>
+    <button
+      type="button"
+      class="btn btn-danger clear"
+      (click)="clearModel()"
+    >Formular Leeren</button>
+    <button
+      type="button"
+      class="btn btn-secondary autocomplete"
+      [ngClass]="autoCompleteButtonConfig.class"
+      [disabled]="autoCompleteButtonConfig.disabled"
+      (click)="toggleAutoComplete()"
+    >{{autoCompleteButtonConfig.label}}</button>
+  </div>
+  <!--
+  <div *ngIf="debug">
+    <hr>
+    <a [href]='modelLink' target='_parent' class="btn btn-outline-light" style="width: 100%; margin-bottom: 5px;">Modellink</a>
+    <br>
+    <a [href]='schemaLink' target='_parent' class="btn btn-outline-light" style="width: 100%; margin-bottom: 5px;">Schemalink</a>
+    <br>
+    <a [href]='historyLink' target='_parent' class="btn btn-outline-light" style="width: 100%; margin-bottom: 5px;">Historylink</a>
+  </div>
+  -->
+</div>

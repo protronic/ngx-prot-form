@@ -41,7 +41,7 @@ export class AppComponent implements OnInit {
           this.content = value.schemaDoc;
           this.schemaID = value.schemaID;
         });
-      this.updateForm(this.formName);
+      // this.updateForm(this.formName);
     }
   }
   // @ViewChild(AceComponent, { read: false } ) componentRef?: AceComponent;
@@ -61,13 +61,12 @@ export class AppComponent implements OnInit {
         if(value['error'] === undefined){
           this.success = true;
           this.loadForm = this.formName;
-          this.updateForm(this.formName);
+          location.reload();
         }
         else{
           this.success = false;
         }
       });
-    // 
   }  
   
 
@@ -90,7 +89,8 @@ export class AppComponent implements OnInit {
       })
     })
       .then( value => (value.json()))
-      .then( value => ({ schemaID: value.recordset[0]._id, schemaDoc: value.recordset[0].log}));
+      .then( value => ({ schemaID: value.recordset[0]._id, schemaDoc: value.recordset[0].log}))
+      .catch( err => (console.error('TODO: implement option to add new schema'), console.error(err), undefined));
     return response;
   }
 

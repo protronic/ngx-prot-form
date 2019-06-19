@@ -1,6 +1,6 @@
 <div>
   <ace [config]="config"  (valueChange)="onValueChange($event)" [(value)]="content"></ace>
   <prot-formly-wrapper [formName]="formName"></prot-formly-wrapper>
-  <button class="submit" [style.background-color]="success ? 'lightgreen' : 'lightred'" (click)="onSubmit()">submit</button>
-  <button class="cancel" >cancel</button>
+  <button class="submit btn" [ngClass]="success ? 'btn-success' : 'btn-danger'" (click)="onSubmit()">submit</button>
+  <button class="cancel btn btn-danger" disabled=true>cancel</button>
 </div>
