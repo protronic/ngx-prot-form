@@ -111,7 +111,7 @@ export class PdfComponent implements OnInit {
           if (this.showBoth) {
              this.dialog.open(DialogComponent, {height: '45%',
                                                 width: '30%',
-                                                'data': [selectedText, this.article, this.database, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText && entry['Artikel'] === this.article))]});
+                                                'data': [ selectedText, this.article, this.database, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText)) ]});
           }
           selectedText = selectedText.split(' ')[0];
           for (let j = 0; j < this.dataSource.length; j++) {
@@ -139,7 +139,7 @@ export class PdfComponent implements OnInit {
           break;
         }
       }
-     } else if (selectedText.substr(0, 2) === 'CO') {
+     } else if(selectedText.substr(0, 2) === 'CO') {
           selectedText = selectedText.substr(2);
           selectedText = selectedText.split(' ')[0];
 //          console.log(selectedText);
@@ -150,7 +150,7 @@ export class PdfComponent implements OnInit {
               if (this.showBoth) {
                 this.dialog.open(DialogComponent, {height: '45%',
                                                    width: '30%',
-                                                   'data': [selectedText, this.article, this.database, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText))]});
+                                                   'data': [ selectedText, this.article, this.database, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText)) ]});
               }
               selectedText = selectedText.split(' ')[0];
               for (let j = 0; j < this.dataSource.length; j++) {
@@ -228,7 +228,6 @@ export class PdfComponent implements OnInit {
                 }));
 
                 this.bonus_info = data;
-                console.log(this.bonus_info)
               })
 
             this.db_con.get_pdf_src(this.article)
@@ -236,60 +235,9 @@ export class PdfComponent implements OnInit {
                 this.pdfSrc = pdfSrc;
                 this.showPDF = true;
               })
+
           } else if (this.article === undefined) {
-            // this.showBoth = false;
-            // this.bestueckung = true;
-            // this.reparatur = false;
-            // this.fertigung = [];
-            // this.httpService.get(this.ressourcenSrc)
-            //   .subscribe(data => {
-            //     for (let i = 0; i < data['rows'].length; i++) {
-            //       this.fertigung.push(data['rows'][i]['value']);
-            //     }
-            //     console.log('fertigung2' + this.fertigung)
-            //     this.article = this.fertigung[0]['Artikelnummer'];
-            //     this.httpService.post(this.database + '/_find', {
-            //       'selector': {
-            //           '$or': [
-            //             {
-            //                 '1': this.article
-            //             },
-            //             {
-            //                 '2': this.article
-            //             }
-            //           ]
-            //       }
-            //     }).subscribe(data2 => {
-            //       if (this.article === data2['docs'][0]['1']) {
-            //         this.showSMD = true;
-            //         this.showTHT = false;
-            //       } else if (this.article === data2['docs'][0]['2']) {
-            //         this.showSMD = false;
-            //         this.showTHT = true;
-            //       }
-            //       this.article = data2['docs'][0]['_id'];
-            //       this.jsonSrc = this.database + this.article;
-            //       this.pdfSrc = this.database + this.article + '/pdf';
-            //       this.httpService.get(this.jsonSrc)
-            //         .subscribe(data3 => {
-            //           this.json = data3;
-            //           this.jsonFile = this.json['Array'];
-            //           this.attachments = [];
-            //           const attach = this.json['_attachments'];
-            //           if (attach.length === undefined) {
-            //             this.attachments.push(Object.keys(attach)[0]);
-            //           } else {
-            //             for (let i = 0; i < attach.length; i++) {
-            //               this.attachments.push(Object.keys(attach[i])[0]);
-            //             }
-            //           }
-            //           this.showPDF = true;
-            //         },
-            //         (err: HttpErrorResponse) => {
-            //           console.log (err.message);
-            //       });
-            //     });
-            // });
+            
           }
         });
     
@@ -381,7 +329,7 @@ export class PdfComponent implements OnInit {
                   for (let h = 0; h < this.fertigung.length; h++) {
                     if (artNum === this.fertigung[h]['RessourceNummer']) {
                       const posi = this.fertigung[h]['Pos'];
-                      if (platine === '1.0') {
+                      if (platine === '1.0' || platine === '1') {
                         if (side === 'TopLayer') {
                           const item = {pos: posi,
                                         des: title,
@@ -400,7 +348,7 @@ export class PdfComponent implements OnInit {
                           bot1++;
                         }
                         break;
-                      } else if (platine === '2.0') {
+                      } else if (platine === '2.0' || platine === '2') {
   //                      this.thtOutline.push(array_element);
                           if (side === 'TopLayer') {
                             const item = {pos: posi,
@@ -743,6 +691,10 @@ export class PdfComponent implements OnInit {
   }
 
   rowClicked(pos: number, des: string) {
+    // this.changeSMD()
+    // this.changeTHT()
+    // console.log({outlineBot: this.outlineBot, outlineTop: this.outlineTop, smdOutlineBot: this.smdOutlineBot, smdOutlineTop: this.smdOutlineTop, thtOutlineBot: this.thtOutlineBot, thtOutlineTop: this.thtOutlineTop})
+    console.log(this.hasComps)
     if (!this.hasComps) {
       this.getComps();
     }

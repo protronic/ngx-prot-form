@@ -6,6 +6,10 @@ import { Injectable } from '@angular/core';
 })
 export class DatabaseConnectionService {
 
+  pickAndPlaceTable: string = 'altium_pick_and_place';
+  pcbViewerView: string = 'pcb_viewer';
+  pdfTable: string = 'pdf_documents';
+
   constructor() {  }
 
   async get_pdf_src(item_nr: string){
@@ -30,7 +34,7 @@ export class DatabaseConnectionService {
         SELECT 
           document
         FROM 
-          pdf_documents
+          ${this.pdfTable}
         WHERE
           platine_komplett = '${item_nr}' OR
           platine_vorbest = '${item_nr}'
@@ -73,12 +77,13 @@ export class DatabaseConnectionService {
           fertigungstyp,
           Vorbest_Platine,
           Komplettbest_Platine,
+          fertiger_artikel,
           seite,
           x_position,
           y_position,
           rotation
         FROM 
-            pcb_viewer
+            ${this.pcbViewerView}
         WHERE 
           Vorbest_Platine = '${item_nr}' OR
           Komplettbest_Platine = '${item_nr}'

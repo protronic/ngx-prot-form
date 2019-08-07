@@ -38,4 +38,3 @@ const array_to_pdf_file = function (array){
 
 
 
-
