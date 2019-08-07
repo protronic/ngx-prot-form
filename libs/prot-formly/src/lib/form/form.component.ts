@@ -79,7 +79,7 @@ export class FormComponent implements OnInit {
   public modeButtonConfig = {
     label: this.mode.modeLabel, 
     class: this.mode.modeClass, 
-    disabled: false
+    disabled: true
   };
   public autoCompleteButtonConfig = {
     label: this.autoAutoComplete ? 'Autocomplete Ausschalten' : 'Autocomplete Einschalten', 
@@ -176,7 +176,8 @@ export class FormComponent implements OnInit {
     }
   }
 
-  submit(model: object) {
+  submit() {
+    let model = this.modelDocument;
     for(let key in model){
       if(model[key] === '') delete model[key];
     }
@@ -193,7 +194,7 @@ export class FormComponent implements OnInit {
     if(this.form.valid){
       console.log({model: model});
       this.submitButtonConfig.class = this.getSubmitButtonColorConfig('btn-warning');
-      this.databaseInteractionService.getModel(model['_id'])
+      this.databaseInteractionService.getModel(model['modelKey'])
         .then(old_doc => {
           // let old_rev = old_doc['_rev'];
           // model['_rev'] = old_rev;

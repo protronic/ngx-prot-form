@@ -1,5 +1,5 @@
 <div class="card" style="padding: 10px;">
-  <form #frm [formGroup]="form" (ngSubmit)="submit(modelDocument)">
+  <form #frm [formGroup]="form" (ngSubmit)="submit()">
     <formly-form [form]="form" [fields]="fields" [model]="modelDocument"></formly-form>
   </form>
   <div class="buttonrow">
@@ -8,7 +8,7 @@
       class="btn submit" 
       [ngClass]="submitButtonConfig.class"
       [disabled]="submitButtonConfig.disabled"
-      (click)="submit(modelDocument)"
+      (click)="submit()"
     >{{submitButtonConfig.label}}</button>
     <button
       type="button"

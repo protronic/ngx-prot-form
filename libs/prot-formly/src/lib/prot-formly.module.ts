@@ -16,6 +16,8 @@ import { RepeatTypeComponent } from './form-types/repeat-section.type';
 import { ArrayTypeComponent } from './form-types/array.type';
 import { WysiwygFieldInput } from './form-types/wysiwyg.type';
 import { FormlyFieldTypeahead } from './form-types/typeahead.type.component';
+import { AmuBooleanTypeComponent } from './form-types/amu-boolean.type';
+import { AmuWriteTypeComponent } from './form-types/amu-write.type';
 
 @NgModule({
   declarations: [
@@ -24,6 +26,8 @@ import { FormlyFieldTypeahead } from './form-types/typeahead.type.component';
     ArrayTypeComponent,
     WysiwygFieldInput,
     FormlyFieldTypeahead,
+    AmuBooleanTypeComponent,
+    AmuWriteTypeComponent
   ],
   imports: [
     // CommonModule,
@@ -38,6 +42,8 @@ import { FormlyFieldTypeahead } from './form-types/typeahead.type.component';
         { name: 'array', component: ArrayTypeComponent },
         { name: 'editor', component: WysiwygFieldInput },
         { name: 'typeahead', component: FormlyFieldTypeahead },
+        { name: 'amubool', component: AmuBooleanTypeComponent },
+        { name: 'amuwrite', component: AmuWriteTypeComponent }
       ],
     }),
     FormsModule,

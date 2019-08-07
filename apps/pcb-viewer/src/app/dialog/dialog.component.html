@@ -1,0 +1,13 @@
+
+<h1 mat-dialog-title> Component Information </h1>
+
+<mat-dialog-content [style.height.px]="'250'">
+	<ul *ngFor="let line of comp">
+		<li><h3> {{line}} </h3>
+		</li>
+	</ul>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button mat-raised-button (click)="close()" color="primary">Close</button>
+</mat-dialog-actions>

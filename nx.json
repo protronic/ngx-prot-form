@@ -28,6 +28,12 @@
     },
     "prot-formly-schema-editor": {
       "tags": []
+    },
+    "pcb-viewer-e2e": {
+      "tags": []
+    },
+    "pcb-viewer": {
+      "tags": []
     }
   }
 }

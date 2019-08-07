@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@angular/core';
+import { Injectable, Optional, assertPlatform } from '@angular/core';
 
 export class SqlWrapperServiceConfig {
   enpointUrl = 'http://prot-subuntu:8081/formly';
@@ -16,6 +16,7 @@ export class SqlWrapperService {
   }
 
   private updateDocument(doc: string, table: string, modelKey: string): Promise<Body>{
+    console.log(table, doc, modelKey);
     let query = `
       UPDATE 
         ${table}
@@ -29,14 +30,13 @@ export class SqlWrapperService {
 
   private insertDocument(doc: string, table: string): Promise<Body>{  
     let tempDoc = JSON.parse(doc);
+    console.log(table, doc);
 
     let query = `      
-      INSERT 
-        INTO ${table} (log)
-      SELECT 
-        value 
-      FROM 
-        OPENJSON('${(tempDoc instanceof(Array) ? doc : [doc])}');
+      INSERT INTO 
+        ${table} (log)
+      VALUES 
+        ('${(tempDoc instanceof(Array) ? doc : [doc])}');
     `
     return this.postData(query);
   }
@@ -76,6 +76,7 @@ export class SqlWrapperService {
   }
 
   async get(table: string, docName: string): Promise<any> {
+    // if(!docName) throw new Error(`docName ist ${docName}.`)
     console.log({sqlGet: [docName, table]});
     return this.getDocument(docName, table)
       .then( (response) => (response.json()))
@@ -89,7 +90,7 @@ export class SqlWrapperService {
   async put(table: string, model: any): Promise<any>{
     console.log({sqlPut: [model, table]});
 
-    return this.get(table, model['modelKey'])
+    return this.get('modeldetails', model['modelKey'])
       .then( response => {
         if(response === undefined){
           // insert

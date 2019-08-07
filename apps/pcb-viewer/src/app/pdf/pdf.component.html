@@ -1,0 +1,149 @@
+<h3 *ngIf="!showPDF">
+		Missing Information: Artikelnummer
+</h3>
+
+<h3 *ngIf="ressourcenSrc===undefined"> No additional info available: missing resource list</h3>
+
+<div *ngIf="showPDF">
+	<h3 *ngIf="articleName!==undefined"> Article: {{articleName}}, Artikelnummer: {{article}} </h3>
+	<h3 *ngIf="articleName===undefined"> Artikelnummer: {{article}} </h3>
+	<mat-checkbox color="primary" class="margin" [checked]="selectMultiple" (change)="selectMultiple = !selectMultiple"> select Multiple </mat-checkbox>
+	<button mat-raised-button (click)="clearAll()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin"> clear all </button>
+	<!-- <mat-checkbox [checked]="checkSMD" (change)="changeSMD()" color="primary" class="margin"> show SMD </mat-checkbox>
+	<mat-checkbox [checked]="checkTHT" (change)="changeTHT()" color="primary" class="margin"> show THT </mat-checkbox> -->
+	
+	<span [style.margin]="'15px'"></span>
+	<button mat-raised-button (click)="small()" color="accent" class="margin" [disabled]="smallDis"> zoom out </button>
+	<button mat-raised-button (click)="big()" color ="accent" class="margin" [disabled]="bigDis"> zoom in </button>
+	
+	<span [style.margin]="'15px'"></span>
+	<button mat-raised-button (click)="prev(true)" color="primary" class ="margin" [disabled]="prevDis"> previous page </button>
+	<button mat-raised-button (click)="next(true)" color="primary" class ="margin" [disabled]="nextDis"> next page </button>
+	
+	<button mat-icon-button [matMenuTriggerFor]="menu" color="primary" class="margin rightButton">
+  		<mat-icon> more_vert </mat-icon>
+	</button>
+	<mat-menu #menu="matMenu">
+		<button mat-menu-item *ngFor="let item of attachments" [style.background-color]="'#673AB7'" [style.color]="'white'" (click)="showAttach(item)">
+			<span> {{item}} </span>
+		</button>
+	</mat-menu>
+	
+	<button mat-raised-button (click)="enter()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin rightButton"> weiter </button>
+	<mat-divider [style.margin.px]="'5'"></mat-divider>
+
+<!-- 	<mat-card *ngIf="showBoth" [style.width.px]="'150'" [style.height.vh]="'80'" [style.overflow]="'auto'" class="column middle">
+		<mat-list *ngFor="let item of outline" [style.float]="'left'">
+			<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+		</mat-list>
+	</mat-card>
+	<mat-card *ngIf="showSMD" [style.width.px]="'150'" [style.height.vh]="'80'" [style.overflow]="'auto'" class="column middle">
+		<mat-list *ngFor="let item of smdOutline" [style.float]="'left'">
+			<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+		</mat-list>
+	</mat-card>
+	<mat-card *ngIf="showTHT" [style.width.px]="'150'" [style.height.vh]="'80'" [style.overflow]="'auto'" class="column middle">
+		<mat-list *ngFor="let item of thtOutline" [style.float]="'left'">
+			<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+		</mat-list>
+	</mat-card> -->
+	
+	<mat-card class="column middle">
+		<mat-table [dataSource]="dataSource" class="upper">
+			<ng-container matColumnDef="position">
+  				<div *matHeaderCellDef class="header firstColumn"> Pos. </div>
+  				<div *matCellDef="let item" class="firstColumn"> {{item.pos}} </div>
+			</ng-container>
+			<ng-container matColumnDef="designator">
+  				<mat-header-cell *matHeaderCellDef> Des. </mat-header-cell>
+  				<mat-cell *matCellDef="let item" (click)="navigateTo(item.des)"> {{item.des}} </mat-cell>
+			</ng-container>		
+			<ng-container matColumnDef="artikelnummer">
+  				<mat-header-cell *matHeaderCellDef> Art.Nr. </mat-header-cell>
+  				<mat-cell *matCellDef="let item"> {{item.art}} </mat-cell>
+			</ng-container>		
+			<ng-container matColumnDef="matchcode">
+  				<mat-header-cell *matHeaderCellDef> Matchcode </mat-header-cell>
+  				<div *matCellDef="let item" class="matchcode"> {{item.match}} </div>>
+			</ng-container>	
+		
+			<mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
+			<mat-row *matRowDef="let row; columns: columnsToDisplay" 
+					(click)="rowClicked(row['pos'], row['des'])"
+					[style.background]="row['pos'] == highlightedRow ? '#d4bff9' : ''" 
+					[style.height.vh]="5"
+					[style.overflow]="'hidden'"></mat-row>
+		</mat-table>
+		
+		<mat-divider [style.margin.px]="5"></mat-divider>
+		<form [style.margin.px]="10" #form="ngForm">
+			<mat-checkbox color="primary" class="margin" [checked]="bestueckung" (change)="changeBest()"> Bestueckung </mat-checkbox>
+			<mat-checkbox color="primary" class="margin" [checked]="reparatur" (change)="changeRep()"> Reparatur </mat-checkbox>
+			<mat-form-field [style.width.px]="400">
+				<input matInput placeholder="Platinennummer" [(ngModel)]="platine" name="Platinennummer" required>
+				<mat-error *ngIf="platine === ''">must specify platinennummer </mat-error>
+			</mat-form-field>
+			<mat-form-field [style.width.px]="400">
+				<textarea matInput placeholder="Comment" [style.height.vh]="10" [(ngModel)]="comment" name="Comment" required></textarea>
+				<mat-error *ngIf="comment===''"> must specify comment </mat-error>
+			</mat-form-field>
+			<button mat-raised-button 
+				(click)="submit(platine, comment)" 
+				color="primary" 
+				[disabled]="comment===''||platine===''||(!bestueckung&&!reparatur)||loginstatus==='anonym'||loginstatus==='anonymous'"> 
+				Submit 
+			</button>
+		</form>
+	</mat-card>
+	<!-- <mat-card *ngIf="showBoth" class="column middle">
+		<div *ngIf="showTop">
+			<mat-list  *ngFor="let item of outlineTop" [style.float]="'left'">
+				<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+			</mat-list>
+		</div>
+		<div *ngIf="showBot">
+			<mat-list *ngFor="let item of outlineBot" [style.float]="'left'">
+				<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+			</mat-list>
+		</div>
+	</mat-card>
+	<mat-card *ngIf="showSMD" class="column middle">
+		<div *ngIf="showTop">
+			<mat-list *ngFor="let item of smdOutlineTop" [style.float]="'left'">
+				<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+			</mat-list>
+		</div>
+		<div *ngIf="showBot">
+			<mat-list *ngFor="let item of smdOutlineBot" [style.float]="'left'">
+				<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+			</mat-list>
+		</div>
+	</mat-card>
+	<mat-card *ngIf="showTHT" class="column middle">
+		<div *ngIf="showTop">
+			<mat-list *ngFor="let item of thtOutlineTop" [style.float]="'left'">
+				<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+			</mat-list>
+		</div>
+		<div *ngIf="showBot">
+			<mat-list *ngFor="let item of thtOutlineBot" [style.float]="'left'">
+				<mat-list-item><a (click)="navigateTo(item)"> {{ item.title }} </a></mat-list-item>
+			</mat-list>
+		</div>
+	</mat-card>  -->
+	
+	
+	<mat-card class="column right">
+			<pdf-viewer [src]="pdfSrc"
+						(after-load-complete)="afterLoadComplete($event)"
+						(page-rendered)="pageRendered($event)"
+						[external-link-target]="'blank'"
+						[zoom]=zoom
+						[render-text]="true"
+						[show-all]="false"
+						[page]="pageNr">
+			</pdf-viewer>
+	</mat-card>
+</div>		
+
+		

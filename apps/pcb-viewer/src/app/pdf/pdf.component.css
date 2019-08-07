@@ -1,0 +1,69 @@
+
+* {
+    box-sizing: border-box;
+}
+
+.column .mat-list-item {
+  height: 20px;
+}
+
+.margin {
+    margin: 10px;
+}
+
+.column {
+    float: left;
+    text-align: left;
+}
+
+.left {
+  	width: 15%;
+}
+
+.middle {
+	width: 500px;
+  	height: 80vh;
+}
+
+.upper {
+  	overflow: auto;
+  	overflow-y: scroll; 
+  	height: 40vh;
+}
+
+.lower {
+  	overflow: auto;
+  	overflow-y: scroll; 
+  	height: 30vh;
+}
+
+.right {
+	width: 60%;
+  	overflow-x: scroll;
+  	height: 80vh;
+}
+
+.header {
+	font-size: 12px;
+	color: gray;
+}
+
+.firstColumn {
+	width: 30px;
+}
+
+.matchcode {
+	font-size: 11px;
+	word-break: keep-all;
+	width: 125px;
+}
+
+.rightButton {
+	float: right;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}

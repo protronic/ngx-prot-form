@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FieldArrayType } from '@ngx-formly/core';
-import { of } from 'rxjs'
 
 @Component({
   selector: 'formly-repeat-section',
