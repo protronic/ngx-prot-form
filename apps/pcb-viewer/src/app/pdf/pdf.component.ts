@@ -9,6 +9,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
+import { DatabaseConnectionService } from '../database-connection.service';
 
 export interface OutlineItem {
   pos?: string;
@@ -46,6 +47,7 @@ export class PdfComponent implements OnInit {
   dataSource: OutlineItem[];
   columnsToDisplay = ['position', 'designator', 'artikelnummer', 'matchcode'];
 
+  bonus_info: Array<any> = [];
   fertigung: String[];
   attachments: String[];
   hasComps = false;
@@ -109,7 +111,7 @@ export class PdfComponent implements OnInit {
           if (this.showBoth) {
              this.dialog.open(DialogComponent, {height: '45%',
                                                 width: '30%',
-                                                'data': [selectedText, this.article, this.database, this.ressourcenSrc]});
+                                                'data': [selectedText, this.article, this.database, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText && entry['Artikel'] === this.article))]});
           }
           selectedText = selectedText.split(' ')[0];
           for (let j = 0; j < this.dataSource.length; j++) {
@@ -148,7 +150,7 @@ export class PdfComponent implements OnInit {
               if (this.showBoth) {
                 this.dialog.open(DialogComponent, {height: '45%',
                                                    width: '30%',
-                                                   'data': [selectedText, this.article, this.database, this.ressourcenSrc]});
+                                                   'data': [selectedText, this.article, this.database, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText))]});
               }
               selectedText = selectedText.split(' ')[0];
               for (let j = 0; j < this.dataSource.length; j++) {
@@ -185,7 +187,7 @@ export class PdfComponent implements OnInit {
   }
 
 
-  constructor(private renderer: Renderer2, private httpService: HttpClient, private dialog: MatDialog, private route: ActivatedRoute) {
+  constructor(private renderer: Renderer2, private httpService: HttpClient, private dialog: MatDialog, private route: ActivatedRoute, private db_con: DatabaseConnectionService) {
   }
 
   ngOnInit() {
@@ -195,7 +197,7 @@ export class PdfComponent implements OnInit {
           this.article = params.artikelnummer;
           this.loginstatus = params.loginstatus;
           this.username = params.username;
-          this.ressourcenSrc = params.jsonUrl;
+          this.ressourcenSrc = 'immer gültig';
           n++;
           if (this.article !== undefined ) {
             this.showBoth = true;
@@ -203,108 +205,93 @@ export class PdfComponent implements OnInit {
             this.showTHT = false;
             this.reparatur = true;
             this.bestueckung = false;
-            this.httpService.post(this.database + '/_find', {
-              'selector': {
-                  '$or': [
-                     {
-                        '1': this.article
-                     },
-                     {
-                        '2': this.article
-                     }
-                  ]
-              }
-            }).subscribe(data => {
-              console.log(data)
-              this.article = data['docs'][0]['_id'];
-              this.jsonSrc = this.database + this.article;
-              this.pdfSrc = this.database + this.article + '/pdf';
-              this.httpService.get(this.jsonSrc)
-                .subscribe(data2 => {
-                  console.log(data2)
-                  this.json = data2;
-                  this.jsonFile = this.json['Array'];
-                  this.attachments = [];
-                  const attach = this.json['_attachments'];
-                  if (attach.length === undefined) {
-                    this.attachments.push(Object.keys(attach)[0]);
-                  } else {
-                    for (let i = 0; i < attach.length; i++) {
-                      this.attachments.push(Object.keys(attach[i])[0]);
-                    }
-                  }
-                  this.showPDF = true;
-                },
-                (err: HttpErrorResponse) => {
-                  console.log (err.message);
-              });
-            });
-            if (this.ressourcenSrc !== undefined) {
-              this.httpService.get(this.ressourcenSrc)
-                .subscribe(data => {
-                  this.fertigung = [];
-                  for (let i = 0; i < data['rows'].length; i++) {
-                    this.fertigung.push(data['rows'][i]['value']);
-                  }
-                  this.articleName = this.fertigung[0]['Artikel'];
-               });
-            }
-          } else if (this.article === undefined && this.ressourcenSrc !== undefined) {
-            this.showBoth = false;
-            this.bestueckung = true;
-            this.reparatur = false;
-            this.fertigung = [];
-            this.httpService.get(this.ressourcenSrc)
-              .subscribe(data => {
-                for (let i = 0; i < data['rows'].length; i++) {
-                  this.fertigung.push(data['rows'][i]['value']);
-                }
-                this.article = this.fertigung[0]['Artikelnummer'];
-                this.httpService.post(this.database + '/_find', {
-                  'selector': {
-                      '$or': [
-                        {
-                            '1': this.article
-                        },
-                        {
-                            '2': this.article
-                        }
-                      ]
-                  }
-                }).subscribe(data2 => {
-                  if (this.article === data2['docs'][0]['1']) {
-                    this.showSMD = true;
-                    this.showTHT = false;
-                  } else if (this.article === data2['docs'][0]['2']) {
-                    this.showSMD = false;
-                    this.showTHT = true;
-                  }
-                  this.article = data2['docs'][0]['_id'];
-                  this.jsonSrc = this.database + this.article;
-                  this.pdfSrc = this.database + this.article + '/pdf';
-                  this.httpService.get(this.jsonSrc)
-                    .subscribe(data3 => {
-                      this.json = data3;
-                      this.jsonFile = this.json['Array'];
-                      this.attachments = [];
-                      const attach = this.json['_attachments'];
-                      if (attach.length === undefined) {
-                        this.attachments.push(Object.keys(attach)[0]);
-                      } else {
-                        for (let i = 0; i < attach.length; i++) {
-                          this.attachments.push(Object.keys(attach[i])[0]);
-                        }
-                      }
-                      this.showPDF = true;
-                    },
-                    (err: HttpErrorResponse) => {
-                      console.log (err.message);
-                  });
-                });
-            });
+            
+            // Eingriff:
+            this.db_con.get_complete_ressource_list(this.article)
+              .then(data => {
+                this.jsonFile = data.map( entry => ({
+                  "Center-x": entry['x_position'],
+                  "Center-y": entry['y_position'],
+                  Comment: entry['ressourcen_nummer'],
+                  Designator: entry['bezeichnung'],
+                  ImportID: entry['fertigungstyp'] === 'SMD' ? "1" : "2",
+                  Rotation: entry['rotation'],
+                  Side: entry['seite']
+                }) );
+
+                this.fertigung = data.map( entry => ({
+                  Artikel: entry['Artikel'],
+                  Fach: entry['Fach'],
+                  Matchcode: entry['Matchcode'],
+                  Menge: entry['Menge'],
+                  Resnum: entry['Resnum']
+                }));
+
+                this.bonus_info = data;
+                console.log(this.bonus_info)
+              })
+
+            this.db_con.get_pdf_src(this.article)
+              .then(pdfSrc => {
+                this.pdfSrc = pdfSrc;
+                this.showPDF = true;
+              })
+          } else if (this.article === undefined) {
+            // this.showBoth = false;
+            // this.bestueckung = true;
+            // this.reparatur = false;
+            // this.fertigung = [];
+            // this.httpService.get(this.ressourcenSrc)
+            //   .subscribe(data => {
+            //     for (let i = 0; i < data['rows'].length; i++) {
+            //       this.fertigung.push(data['rows'][i]['value']);
+            //     }
+            //     console.log('fertigung2' + this.fertigung)
+            //     this.article = this.fertigung[0]['Artikelnummer'];
+            //     this.httpService.post(this.database + '/_find', {
+            //       'selector': {
+            //           '$or': [
+            //             {
+            //                 '1': this.article
+            //             },
+            //             {
+            //                 '2': this.article
+            //             }
+            //           ]
+            //       }
+            //     }).subscribe(data2 => {
+            //       if (this.article === data2['docs'][0]['1']) {
+            //         this.showSMD = true;
+            //         this.showTHT = false;
+            //       } else if (this.article === data2['docs'][0]['2']) {
+            //         this.showSMD = false;
+            //         this.showTHT = true;
+            //       }
+            //       this.article = data2['docs'][0]['_id'];
+            //       this.jsonSrc = this.database + this.article;
+            //       this.pdfSrc = this.database + this.article + '/pdf';
+            //       this.httpService.get(this.jsonSrc)
+            //         .subscribe(data3 => {
+            //           this.json = data3;
+            //           this.jsonFile = this.json['Array'];
+            //           this.attachments = [];
+            //           const attach = this.json['_attachments'];
+            //           if (attach.length === undefined) {
+            //             this.attachments.push(Object.keys(attach)[0]);
+            //           } else {
+            //             for (let i = 0; i < attach.length; i++) {
+            //               this.attachments.push(Object.keys(attach[i])[0]);
+            //             }
+            //           }
+            //           this.showPDF = true;
+            //         },
+            //         (err: HttpErrorResponse) => {
+            //           console.log (err.message);
+            //       });
+            //     });
+            // });
           }
         });
-    
     
     
    
@@ -358,14 +345,14 @@ export class PdfComponent implements OnInit {
                 const side: string = this.jsonFile[i]['Side'];
                 const artNum: string = this.jsonFile[i]['Comment'];
                 let matchCode: string;
-                if (this.showBoth && this.ressourcenSrc !== undefined) {
+                if (this.showBoth) {
                   for (let j = 0; j < this.fertigung.length; j++) {
                     if (this.fertigung[j]['Resnum'] === artNum) {
                       matchCode = this.fertigung[j]['Matchcode'];
                       break;
                     }
                   }
-                } else if ((this.showSMD || this.showTHT) && this.ressourcenSrc !== undefined) {
+                } else if (this.showSMD || this.showTHT) {
                   for (let j = 0; j < this.fertigung.length; j++) {
                     if (this.fertigung[j]['RessourceNummer'] === artNum) {
                       matchCode = this.fertigung[j]['Matchcode'];
