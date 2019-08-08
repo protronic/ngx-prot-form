@@ -70,7 +70,7 @@
 			<mat-header-row *matHeaderRowDef="columnsToDisplay"></mat-header-row>
 			<mat-row *matRowDef="let row; columns: columnsToDisplay" 
 					(click)="rowClicked(row['pos'], row['des'])"
-					[style.background]="row['pos'] == highlightedRow ? '#d4bff9' : ''" 
+					[style.background]="backgroundCalc(row)" 
 					[style.height.vh]="5"
 					[style.overflow]="'hidden'"></mat-row>
 		</mat-table>

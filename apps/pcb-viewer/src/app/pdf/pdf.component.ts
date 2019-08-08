@@ -71,7 +71,7 @@ export class PdfComponent implements OnInit {
   smallDis = false;
   bigDis = false;
   showPDF = false;
-  highlightedRow: number = 0;
+  highlightedRow: Array<number> = [];
   hasRows = false;
   rows: NodeListOf<Element>;
 
@@ -116,13 +116,13 @@ export class PdfComponent implements OnInit {
           selectedText = selectedText.split(' ')[0];
           for (let j = 0; j < this.dataSource.length; j++) {
             if (selectedText === this.dataSource[j]['des']) {
-              this.highlightedRow = parseInt(this.dataSource[j]['pos']);
+              this.highlightedRow.push( parseInt(this.dataSource[j]['pos']));
             }
           }
           this.selectMultiple = true;
           for (let j = 0; j < this.dataSource.length; j++) {
             const position: string = this.dataSource[j]['pos'];
-            if (position === this.highlightedRow.toString()) {
+            if (this.highlightedRow.includes(Number.parseInt(position))) {
               this.highlight(this.dataSource[j]['des'] + ' ');
               this.rows[j].parentElement.scrollTop = this.rows[j].getBoundingClientRect().height * (j - 5);
             }
@@ -155,13 +155,13 @@ export class PdfComponent implements OnInit {
               selectedText = selectedText.split(' ')[0];
               for (let j = 0; j < this.dataSource.length; j++) {
                 if (selectedText === this.dataSource[j]['des']) {
-                  this.highlightedRow = parseInt(this.dataSource[j]['pos']);
+                  this.highlightedRow.push( parseInt(this.dataSource[j]['pos']));
                 }
               }
               this.selectMultiple = true;
               for (let j = 0; j < this.dataSource.length; j++) {
                 const position: string = this.dataSource[j]['pos'];
-                if (position === this.highlightedRow.toString()) {
+                if (this.highlightedRow.includes(Number.parseInt(position))) {
                   this.highlight(this.dataSource[j]['des'] + ' ');
                   this.rows[j].parentElement.scrollTop = this.rows[j].getBoundingClientRect().height * (j - 5);
                 }
@@ -468,6 +468,7 @@ export class PdfComponent implements OnInit {
   }
 
   clearAll() {
+    this.highlightedRow = [];
     for (let i = 0; i < document.querySelector('.textLayer').querySelectorAll('span').length; i++) {
       this.renderer.removeStyle(document.querySelector('.textLayer').querySelectorAll('span')[i], 'background-color');
     }
@@ -549,7 +550,7 @@ export class PdfComponent implements OnInit {
     }
     this.changeData();
     if (reset) {
-      this.highlightedRow = 0;
+      this.highlightedRow = [];
     }
   }
 
@@ -568,7 +569,7 @@ export class PdfComponent implements OnInit {
     }
     this.changeData();
     if (reset) {
-      this.highlightedRow = 0;
+      this.highlightedRow = [];
     }
   }
 
@@ -587,7 +588,7 @@ export class PdfComponent implements OnInit {
         this.selectMultiple = true;
         for (let i = 0; i < this.dataSource.length; i++) {
           const position: string = this.dataSource[i]['pos'];
-          if (position === this.highlightedRow.toString()) {
+          if (this.highlightedRow.includes(Number.parseInt(position))) {
             this.highlight(this.dataSource[i]['des'] + ' ');
           }
         }
@@ -611,7 +612,7 @@ export class PdfComponent implements OnInit {
         this.selectMultiple = true;
         for (let i = 0; i < this.dataSource.length; i++) {
           const position: string = this.dataSource[i]['pos'];
-          if (position === this.highlightedRow.toString()) {
+          if (this.highlightedRow.includes(Number.parseInt(position))) {
             this.highlight(this.dataSource[i]['des'] + ' ');
           }
         }
@@ -693,29 +694,46 @@ export class PdfComponent implements OnInit {
     }
   }
 
+  backgroundCalc(row: Array<any>){
+    return this.highlightedRow.includes(Number(row['pos'])) ? '#d4bff9' : '';
+  }
+  
+
   rowClicked(pos: number, des: string) {
+    pos = Number.parseInt(pos.toString());
     // this.changeSMD()
     // this.changeTHT()
     // console.log({outlineBot: this.outlineBot, outlineTop: this.outlineTop, smdOutlineBot: this.smdOutlineBot, smdOutlineTop: this.smdOutlineTop, thtOutlineBot: this.thtOutlineBot, thtOutlineTop: this.thtOutlineTop})
-    console.log(this.hasComps)
     if (!this.hasComps) {
       this.getComps();
     }
     let change: boolean = false;
     if (!this.selectMultiple) {
       this.clearAll();
+      this.highlightedRow = []
       change = true;
     }
-    this.highlightedRow = pos;
-    this.selectMultiple = true;
-    for (let i = 0; i < this.dataSource.length; i++) {
-      const position: string = this.dataSource[i]['pos'];
-      if (position === this.highlightedRow.toString()) {
-        this.highlight(this.dataSource[i]['des'] + ' ');
+    this.highlightedRow.push(pos);
+    if(!this.bestueckung || !this.selectMultiple){
+      this.selectMultiple = true;
+      for (let i = 0; i < this.dataSource.length; i++) {
+        const position: string = this.dataSource[i]['pos'];
+        if (this.highlightedRow.includes(Number.parseInt(position))) {
+          this.highlight(this.dataSource[i]['des'] + ' ');
+        }
       }
-    }
-    if (change) {
-      this.selectMultiple = false;
+      if (change) {
+        this.selectMultiple = false;
+      }
+    } else {
+      this.clearAll()
+      let selectedItem = this.dataSource[pos - 1]['art']
+      for(let i = 0; i < this.dataSource.length; i++){
+        if(this.dataSource[i]['art'] == selectedItem){
+          this.highlightedRow.push(i + 1)
+          this.highlight(this.dataSource[i]['des'] + ' ');
+        }
+      }
     }
   }
 
@@ -725,12 +743,12 @@ export class PdfComponent implements OnInit {
   }
 
   enter() {
-    this.highlightedRow++;
+    if(!this.selectMultiple) this.highlightedRow[0]++;
 
       // switch page if necessary
     if (!this.showBoth) {
       for (let i = 0; i < this.fertigung.length; i++) {
-        if (this.fertigung[i]['Pos'] === this.highlightedRow.toString()) {
+        if (this.highlightedRow.includes(this.fertigung[i]['Pos'])) {  
           for (let j = 0; j < this.jsonFile.length; j++) {
             if (this.jsonFile[j]['Comment'] === this.fertigung[i]['RessourceNummer']) {
               if (this.showBot && this.jsonFile[j]['Side'] === 'TopLayer') {
@@ -750,10 +768,10 @@ export class PdfComponent implements OnInit {
         for (let i = 0; i < this.rows.length; i++) {
   //      console.log(this.rows[i].querySelector('.mat-cell').innerHTML);
           const position = this.dataSource[i]['pos'];
-          if (position === this.highlightedRow.toString()) {
+          if (this.highlightedRow.includes(Number.parseInt(position))) { 
   //        this.rows[i].scrollIntoView({ behavior: 'smooth', block: 'end' });
             this.rows[i].parentElement.scrollTop = (i - 3) * this.rows[i].getBoundingClientRect().height;
-          } else if (position === (this.highlightedRow + 1).toString()) {
+          } else if (position === (this.highlightedRow[0] + 1).toString()) {
             break;
           }
         }
@@ -765,7 +783,7 @@ export class PdfComponent implements OnInit {
         this.selectMultiple = true;
         for (let i = 0; i < this.dataSource.length; i++) {
           const position: string = this.dataSource[i]['pos'];
-          if (position === this.highlightedRow.toString()) {
+          if (this.highlightedRow.includes(Number.parseInt(position))) {
             this.highlight(this.dataSource[i]['des'] + ' ');
           }
         }
