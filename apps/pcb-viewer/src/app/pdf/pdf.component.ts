@@ -228,13 +228,16 @@ export class PdfComponent implements OnInit {
                 }));
 
                 this.bonus_info = data;
-              })
-
-            this.db_con.get_pdf_src(this.article)
-              .then(pdfSrc => {
-                this.pdfSrc = pdfSrc;
+                this.pdfSrc = `http://prot-nas/pdf/altium/${data[0]['Komplettbest_Platine']}/AssemblyDrawings.pdf`;
                 this.showPDF = true;
               })
+            
+            
+            // this.db_con.get_pdf_src(this.article)
+            //   .then(pdfSrc => {
+            //     this.pdfSrc = pdfSrc;
+            //     this.showPDF = true;
+            //   })
 
           } else if (this.article === undefined) {
             
@@ -410,9 +413,9 @@ export class PdfComponent implements OnInit {
 //        this.renderer.setValue(document.querySelector('.textLayer').querySelectorAll('div')[this.n], this.comps[i].substr(5));
 //        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('div')[this.n], 'color', 'black');
 //        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('div')[this.n], 'font-size', '30px');
-        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('div')[n], 'background-color', '#5300e8');
-        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('div')[n], 'height', '3vh');
-        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('div')[n], 'width', '5vh');
+        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('span')[n], 'background-color', '#5300e8');
+        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('span')[n], 'height', '3vh');
+        this.renderer.setStyle(document.querySelector('.textLayer').querySelectorAll('span')[n], 'width', '5vh');
       }
     }
     text = text.split(' ')[0];
@@ -439,7 +442,7 @@ export class PdfComponent implements OnInit {
 
     const textLayer: NodeListOf<Element> = document.querySelectorAll('.textLayer');
 //      console.log('textLayer');
-    const divs: NodeListOf<Element> = textLayer[0].querySelectorAll('div');
+    const divs: NodeListOf<Element> = textLayer[0].querySelectorAll('span');
 //      console.log('divs');
 //    console.log(divs.length);
     if (divs.length > 0) {
@@ -465,8 +468,8 @@ export class PdfComponent implements OnInit {
   }
 
   clearAll() {
-    for (let i = 0; i < document.querySelector('.textLayer').querySelectorAll('div').length; i++) {
-      this.renderer.removeStyle(document.querySelector('.textLayer').querySelectorAll('div')[i], 'background-color');
+    for (let i = 0; i < document.querySelector('.textLayer').querySelectorAll('span').length; i++) {
+      this.renderer.removeStyle(document.querySelector('.textLayer').querySelectorAll('span')[i], 'background-color');
     }
   }
 
