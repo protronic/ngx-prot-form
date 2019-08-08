@@ -49,7 +49,7 @@
 	</mat-card> -->
 	
 	<mat-card class="column middle">
-		<mat-table [dataSource]="dataSource" class="upper">
+		<mat-table [dataSource]="filterDataSource()" class="upper">
 			<ng-container matColumnDef="position">
   				<div *matHeaderCellDef class="header firstColumn"> Pos. </div>
   				<div *matCellDef="let item" class="firstColumn"> {{item.pos}} </div>
@@ -77,7 +77,8 @@
 		
 		<mat-divider [style.margin.px]="5"></mat-divider>
 		<form [style.margin.px]="10" #form="ngForm">
-			<mat-checkbox color="primary" class="margin" [checked]="bestueckung" (change)="changeBest()"> Bestueckung </mat-checkbox>
+			<mat-checkbox color="primary" class="margin" [checked]="showTHT" (change)="changeTht()"> THT </mat-checkbox>
+			<mat-checkbox color="primary" class="margin" [checked]="showSMD" (change)="changeSmd()"> SMD </mat-checkbox>
 			<mat-checkbox color="primary" class="margin" [checked]="reparatur" (change)="changeRep()"> Reparatur </mat-checkbox>
 			<mat-form-field [style.width.px]="400">
 				<input matInput placeholder="Platinennummer" [(ngModel)]="platine" name="Platinennummer" required>

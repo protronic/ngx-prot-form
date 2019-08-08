@@ -205,6 +205,7 @@ export class PdfComponent implements OnInit {
             this.showTHT = false;
             this.reparatur = true;
             this.bestueckung = false;
+            this.selectMultiple = true; 
             
             // Eingriff:
             this.db_con.get_complete_ressource_list(this.article)
@@ -621,16 +622,44 @@ export class PdfComponent implements OnInit {
       .catch(err => console.error('p4', err));
   }
 
-  changeBest() {
-    this.bestueckung = !this.bestueckung;
-    if (this.bestueckung && this.reparatur) {
+  filterDataSource(){
+    if(this.reparatur){
+      return this.dataSource;
+    }
+    else if(this.showTHT){
+      return this.dataSource.filter( row => (this.bonus_info.find( entry => (entry.ressourcen_nummer === row.art))['fertigungstyp'] === 'THT'));
+    }
+    else{
+      return this.dataSource.filter( row => (this.bonus_info.find( entry => (entry.ressourcen_nummer === row.art))['fertigungstyp'] === 'SMD'));
+    }
+  }
+
+  changeTht() {
+    this.clearAll()
+    this.bestueckung = this.showTHT || this.showSMD;
+    this.showTHT = !this.showTHT;
+    if ((this.showTHT && this.reparatur) || (this.showTHT && this.showSMD)) {
       this.reparatur = false;
+      this.showSMD = false;
+    }
+  }
+
+  changeSmd() {
+    this.clearAll()
+    this.bestueckung = this.showTHT || this.showSMD;
+    this.showSMD = !this.showSMD;
+    if ((this.showSMD && this.reparatur) || (this.showSMD && this.showTHT)) {
+      this.reparatur = false;
+      this.showTHT = false;
     }
   }
 
   changeRep() {
+    this.clearAll()
     this.reparatur = !this.reparatur;
-    if (this.bestueckung && this.reparatur) {
+    if ((this.showSMD && this.reparatur) || (this.reparatur && this.showTHT)) {
+      this.showSMD = false;
+      this.showTHT = false;
       this.bestueckung = false;
     }
   }
@@ -700,6 +729,7 @@ export class PdfComponent implements OnInit {
   
 
   rowClicked(pos: number, des: string) {
+    console.log(this.dataSource)
     pos = Number.parseInt(pos.toString());
     // this.changeSMD()
     // this.changeTHT()
