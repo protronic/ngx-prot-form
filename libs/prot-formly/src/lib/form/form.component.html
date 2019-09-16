@@ -10,13 +10,20 @@
       [disabled]="submitButtonConfig.disabled"
       (click)="submit()"
     >{{submitButtonConfig.label}}</button>
-    <button
+    <button 
+      type="button" 
+      class="btn btn-primary newbtn" 
+      [ngClass]="createNewChargeConfig.class"
+      [disabled]="createNewChargeConfig.disabled"
+      (click)="newCharge()"
+    >{{createNewChargeConfig.label}}</button>
+    <!-- <button
       type="button"
       class="btn mode"
       [ngClass]="modeButtonConfig.class"
       [disabled]="modeButtonConfig.disabled"
       (click)="changeMode()"
-    >{{modeButtonConfig.label}}</button>
+    >{{modeButtonConfig.label}}</button> -->
     <button
       class="btn btn-danger back"
       [disabled]="previousModel === undefined"

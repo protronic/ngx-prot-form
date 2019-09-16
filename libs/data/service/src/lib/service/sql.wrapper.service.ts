@@ -75,6 +75,35 @@ export class SqlWrapperService {
     })
   }
 
+  private async createNewEmptyDocument(includeChargeNumber: boolean): Promise<any>{
+    let query = `
+      INSERT INTO 
+        model (log) 
+      VALUES 
+        ('{}');
+      
+      DECLARE @model_id INT;
+      SELECT @model_id = (
+        SELECT 
+          SCOPE_IDENTITY()
+      );
+
+      ${includeChargeNumber ? 'INSERT INTO ChargenNummerZuordnung (ModelId) Values (@model_id);' : ''}
+
+      SELECT 
+        @model_id AS model_id,
+        ChargenNummer
+      FROM  
+        ChargenNummerZuordnung
+      WHERE 
+        ModelId = @model_id;
+    `
+    //  .recordset[0].scope
+    return this.postData(query)
+      .then( response => response.json() )
+      .then( response => response.recordset[0]);
+  }
+
   async get(table: string, docName: string): Promise<any> {
     // if(!docName) throw new Error(`docName ist ${docName}.`)
     console.log({sqlGet: [docName, table]});

@@ -79,13 +79,18 @@ export class FormComponent implements OnInit {
   public modeButtonConfig = {
     label: this.mode.modeLabel, 
     class: this.mode.modeClass, 
-    disabled: true
+    disabled: false
   };
   public autoCompleteButtonConfig = {
     label: this.autoAutoComplete ? 'Autocomplete Ausschalten' : 'Autocomplete Einschalten', 
     class: {}, 
     disabled: false
   };
+  public createNewChargeConfig = {
+    label: 'Neue Seriennummer/ChargenNummer Anlegen',
+    class: {'btn-primary': true},
+    disabled: false
+  }
 
   clearModel(){
     
@@ -182,6 +187,14 @@ export class FormComponent implements OnInit {
       if(model[key] === '') delete model[key];
     }
     this.sendData(model, true);
+  }
+
+  newCharge() {
+    this.previousModel = {};
+    Object.keys(this.modelDocument).forEach(key => {
+      this.previousModel[key] = this.modelDocument[key];
+    });
+    this.modelDocument = {};    
   }
 
   revert(previousModel: object){

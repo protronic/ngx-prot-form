@@ -636,21 +636,21 @@ export class PdfComponent implements OnInit {
 
   changeTht() {
     this.clearAll()
-    this.bestueckung = this.showTHT || this.showSMD;
     this.showTHT = !this.showTHT;
     if ((this.showTHT && this.reparatur) || (this.showTHT && this.showSMD)) {
       this.reparatur = false;
       this.showSMD = false;
+      this.bestueckung = true;
     }
   }
 
   changeSmd() {
     this.clearAll()
-    this.bestueckung = this.showTHT || this.showSMD;
     this.showSMD = !this.showSMD;
     if ((this.showSMD && this.reparatur) || (this.showSMD && this.showTHT)) {
       this.reparatur = false;
       this.showTHT = false;
+      this.bestueckung = true;
     }
   }
 

@@ -87,6 +87,11 @@ export class DatabaseInteractionService {
     return result;
   }
 
+  createEmptyDocument(){
+    // TODO: hier
+    // return this.sqlWrapperService.createNewEmptyDocument(includeChargeNumber)
+  }
+
   getUniqueSearchable(field: string, value: any): Promise<object> | null {
     return new Promise((resolve, reject) => {
       let fieldValueMap = [{field: field, value: value}]

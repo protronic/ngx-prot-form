@@ -1,0 +1,14 @@
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<div class="form-group">
+  <label for="idInput">Seriennummer</label>
+  <input id="idInput" class="form-control" type="text" [formControl]="formControl" [formlyAttributes]="field" (change)="onChange($event)" disabled>
+</div>
+<div class="form-check">
+  <input id="autoGen" class="form-check-input" type="checkbox">
+  <label for="autoGen" class="form-check-label">Seriennummer automatisch generieren</label>
+  <input type="text" [formControl]="formControl" [formlyAttributes]="field" [(ngModel)]="result" style="display: none;">
+</div>
+<small class="form-text text-muted">description</small>

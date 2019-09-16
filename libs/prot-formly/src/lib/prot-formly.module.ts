@@ -18,6 +18,7 @@ import { WysiwygFieldInput } from './form-types/wysiwyg.type';
 import { FormlyFieldTypeahead } from './form-types/typeahead.type.component';
 import { AmuBooleanTypeComponent } from './form-types/amu-boolean.type';
 import { AmuWriteTypeComponent } from './form-types/amu-write.type';
+import { TimestampFieldType } from './form-types/timestamp-field.type';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { AmuWriteTypeComponent } from './form-types/amu-write.type';
     WysiwygFieldInput,
     FormlyFieldTypeahead,
     AmuBooleanTypeComponent,
-    AmuWriteTypeComponent
+    AmuWriteTypeComponent,
+    TimestampFieldType
   ],
   imports: [
     // CommonModule,
@@ -43,7 +45,8 @@ import { AmuWriteTypeComponent } from './form-types/amu-write.type';
         { name: 'editor', component: WysiwygFieldInput },
         { name: 'typeahead', component: FormlyFieldTypeahead },
         { name: 'amubool', component: AmuBooleanTypeComponent },
-        { name: 'amuwrite', component: AmuWriteTypeComponent }
+        { name: 'amuwrite', component: AmuWriteTypeComponent },
+        { name: 'timestampfield', component: TimestampFieldType}
       ],
     }),
     FormsModule,
