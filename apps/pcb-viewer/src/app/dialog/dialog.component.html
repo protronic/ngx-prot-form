@@ -1,13 +1,45 @@
 
-<h1 mat-dialog-title> Component Information </h1>
+<h2 mat-dialog-title *ngIf=component> Mehr Information </h2>
+<h2 mat-dialog-title *ngIf=bestueckung> Aktueller Bestückungsvorgang </h2>
+<h2 mat-dialog-title *ngIf=reparatur> Aktueller Raparaturvorgang </h2>
+<h2 mat-dialogue-title *ngIf=choose> Modell auswählen </h2>
+<p *ngIf=choose> bitte warten, bis PDF und Tabelle im Hintergrund vollständig geladen sind </p>
 
-<mat-dialog-content [style.height.px]="'250'">
-	<ul *ngFor="let line of comp">
-		<li><h3> {{line}} </h3>
-		</li>
-	</ul>
-</mat-dialog-content>
+<div *ngIf="!choose">
+  <mat-dialog-content [style.height.px]="'250'">
+	  <ul *ngFor="let line of comp">
+		  <li><h3> {{line}} </h3>
+		  </li>
+	  </ul>
+  </mat-dialog-content>
+</div>
+
+<div *ngIf=choose>
+  <mat-dialog-content [style.height.px]="'250'">
+    <mat-table [dataSource]=formulare>
+      <ng-container matColumnDef="Id">
+        <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
+        <mat-cell *matCellDef="let item"> {{item.id}} </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Art">
+          <mat-header-cell *matHeaderCellDef> Art </mat-header-cell>
+          <mat-cell *matCellDef="let item"> {{item.parentForm}} </mat-cell>
+      </ng-container>
+      <ng-container matColumnDef="Time">
+          <mat-header-cell *matHeaderCellDef> Zeit </mat-header-cell>
+          <mat-cell *matCellDef="let item"> {{item.time}} </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="display; sticky: true"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: display;"
+        (click)="close(row['id'])"
+        [style.height.vh]="5"
+        [style.overflow]="'hidden'"></mat-row>
+    </mat-table>
+  </mat-dialog-content>
+</div>
 
 <mat-dialog-actions>
-	<button mat-raised-button (click)="close()" color="primary">Close</button>
+  <button mat-raised-button (click)="close()" color="primary">Close</button>
 </mat-dialog-actions>
+

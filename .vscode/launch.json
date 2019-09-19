@@ -4,18 +4,14 @@
   // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
       "type": "chrome",
       "request": "launch",
       "name": "Launch Chrome against localhost",
-      "url": "http://localhost:4200",
-      "webRoot": "${workspaceFolder}/prot/apps/prot-formly-test2"
-    },    
-      {
-          "name": "Launch index.html",
-          "type": "chrome",
-          "request": "launch",
-          "file": "${workspaceFolder}/prot/apps/prot-formly-test2/src/index.html"
-      }
+      "url": "http://localhost:4200/index.html?artikelnummer=0603000307",
+      "webRoot": "${workspaceFolder}/apps/pcb-viewer",
+      "sourceMaps": true
+    }
   ]
 }
