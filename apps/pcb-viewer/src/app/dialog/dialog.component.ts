@@ -13,21 +13,27 @@ export class DialogComponent implements OnInit {
   formulare: Object[];
   selectedText: string;
   comp: string[] = [];
-  reparatur = false;
-  bestueckung = false;
-  component = false;
-  choose = false;
+  reparatur: boolean;
+  bestueckung: boolean;
+  component: boolean;
+  choose: boolean;
+  form: boolean;
+  platine: string;
   display= ['Id', 'Art', 'Time'];
   headers: string[] = ['Designator', 'Quantity', 'Comment', 'Matchcode', 'Lieferant', 'HArtikelnummer', 'Hersteller', 'Einzelpreis']; // maybe
 
   constructor(private dialogRef: MatDialogRef<DialogComponent>, @Inject(MAT_DIALOG_DATA) data) {
     this.art=data[0];
+    this.reparatur = false;
+    this.bestueckung = false;
+    this.component = false;
+    this.choose = false;
+    this.form = false;
+    this.platine='';
     if(this.art==='Component'){
       this.selectedText = data[1];
       this.article = data[2];
       this.ressourcen = data[3];
-      this.reparatur = false;
-      this.bestueckung = false;
       this.component = true;
     }else if(this.art==='Article'){
       this.comp=data[1];
@@ -36,6 +42,8 @@ export class DialogComponent implements OnInit {
     }else if(this.art==='Choose'){
       this.formulare = data[1];
       this.choose = true;
+    }else if(this.art==='Form'){
+      this.form = true;
     }
 
   }

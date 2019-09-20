@@ -36,8 +36,7 @@ export class DatabaseConnectionService {
     })
    }
 
-  //später für beliebige Platinennummer und Artikelnummer
-  async get_formular(item_nr: string, plat_nr: string){
+  async get_formular(item_nr: string){
     return fetch('http://prot-subuntu:8081/formly', {
       method: 'POST',
       headers: {
@@ -63,8 +62,7 @@ export class DatabaseConnectionService {
       FROM
         model
       WHERE
-        JSON_VALUE(log, '$."Artikelnummer"') = '${item_nr}' AND
-        JSON_VALUE(log, '$."Platinennummer"') = '${plat_nr}'
+        JSON_VALUE(log, '$."Artikelnummer"') = '${item_nr}'
       `})
     })
     .then(data => data.json())

@@ -104,11 +104,11 @@ export class PdfComponent implements OnInit {
   username: string;
   addInfo: string[];
   platinenNr: string;
-  formID = '';
+  formID: string;
 
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-  //hebt Reihe(n) und Komponente(n) hervor nachdem auf Kopmonente geglickt wurde
+  //hebt Reihe(n) und Komponente(n) hervor nachdem auf Kopmonente geklickt wurde
   //arbeitet stark mit BackgroundLayer des PDFs und ist auf dessen Beschaffenheit angepasst
   @HostListener('dblclick') onMouseOver() {
     if(this.currentData===undefined) this.currentData=this.filterDataSource();
@@ -240,6 +240,7 @@ export class PdfComponent implements OnInit {
           this.article = params.artikelnummer;
           this.loginstatus = params.loginstatus;
           this.username = params.username;
+          this.formID = params.model;
           if (this.article !== undefined ) {
             //momentan: für SMD als Standard
             //aufgerufen falls keine Nummer übergeben
@@ -249,9 +250,9 @@ export class PdfComponent implements OnInit {
             this.reparatur = true;
             this.bestueckung = false;
             this.selectMultiple = false;
-            const platine = '123';
 
-            this.db_con.get_formular(this.article, platine)
+            //holt alle formulare mit spezifizierter Artikelnummer
+            this.db_con.get_formular(this.article)
               .then(data =>{
                 this.formulare = data.map( entry => ({
                   id: entry['_id'],
@@ -324,56 +325,10 @@ export class PdfComponent implements OnInit {
 
   //ausgeführt nachdem PDF geladen
   afterLoadComplete(pdf: PDFDocumentProxy) {
-
     this.pdf = pdf;
     this.isLoaded = true;
     this.loadOutline();
     this.totalPages = pdf.numPages;
-
-    //falls formulare existieren, wird auswahl geboten
-    if(this.formulare.length>0){
-      const dialogRef = this.dialog.open(DialogComponent, {height: '45%',
-                                         width: '30%',
-                                         'data': ['Choose', this.formulare]});
-      dialogRef.afterClosed().subscribe(result => {
-        this.formID = result;
-        for(let i=0; i<this.formulare.length; i++){
-          if(this.formulare[i].id===result){
-            const form = this.formulare[i];
-            this.currentRow = form.currentRow;
-            this.platine = form.platinenNr;
-            this.comment = form.comment;
-            this.pageNr = form.pageNr;
-            this.showBot = form.showBot;
-            this.showTop = form.showTop;
-            this.showBoth = form.showBoth;
-            this.showTHT = form.showTHT;
-            this.showSMD = form.showSMD;
-            this.bestueckung = form.parentForm === 'Bestückung';
-            this.reparatur = form.parentForm !== 'Bestückung';
-            this.currentData = this.filterDataSource();
-            this.convertComps(form.changedComps);
-            this.convertRow(form.highlightedRow);
-            //highlight Komponenten
-            if(!this.hasComps){this.getComps();}
-            for(let j=0; j<this.highlightedRow.length; j++){
-              this.highlight(this.highlightedRow[j] + ' ');
-            }
-            //scroll zur richtigen Zeile
-            this.rows = document.querySelectorAll('.mat-row');
-            for (let j = 0; j < this.rows.length; j++) {
-              const designator = this.dataSource[j]['des'];
-              if (this.highlightedRow.includes(designator)) {
-                this.rows[j].parentElement.scrollTop = (this.currentRow) * this.rows[j].getBoundingClientRect().height;
-                break;
-              }
-            }
-            break;
-          }
-        }
-      })
-    }
-//    this.delay(20000);
   }
 
   //gibt Hingtergrundfarbe für Reihe wieder, in Referenz zu highlightedRow
@@ -524,6 +479,36 @@ export class PdfComponent implements OnInit {
       this.bestueckung = true;
     }
     this.currentData=this.filterDataSource();
+  }
+
+  //Zeige Formulare mit bestimmter PlatinenNr zur Auswahl an und lade danach ausgewähltes
+  chooseForm(){
+    const dialogRef = this.dialog.open(DialogComponent, {height: '45%',
+                                         width: '30%',
+                                         'data': ['Form']});
+    const data = [];
+    dialogRef.afterClosed().subscribe(result => {
+      this.platine = result;
+      for(let i=0; i<this.formulare.length; i++){
+        if(this.formulare[i].platinenNr === this.platine){
+          data.push(this.formulare[i]);
+        }
+      }
+      const dialog = this.dialog.open(DialogComponent, {height: '45%',
+                                         width: '30%',
+                                         'data': ['Choose', data]});
+      dialog.afterClosed().subscribe(res => {
+        this.formID = res;
+        console.log(res);
+        for(let i=0; i<this.formulare.length; i++){
+          if(this.formulare[i].id===res){
+            this.loadForm(this.formulare[i]);
+            break;
+          }
+        }
+      })
+    });
+
   }
 
   //mache alle Hervorhebungen rückgängig
@@ -719,6 +704,38 @@ export class PdfComponent implements OnInit {
     }
   }
 
+  //lädt übergebenes Formular
+  loadForm(form: Formular){
+    this.currentRow = form.currentRow;
+    this.platine = form.platinenNr;
+    this.comment = form.comment;
+    this.pageNr = form.pageNr;
+    this.showBot = form.showBot;
+    this.showTop = form.showTop;
+    this.showBoth = form.showBoth;
+    this.showTHT = form.showTHT;
+    this.showSMD = form.showSMD;
+    this.bestueckung = form.parentForm === 'Bestückung';
+    this.reparatur = form.parentForm !== 'Bestückung';
+    this.currentData = this.filterDataSource();
+    this.convertComps(form.changedComps);
+    this.convertRow(form.highlightedRow);
+    //highlight Komponenten
+    if(!this.hasComps){this.getComps();}
+    for(let j=0; j<this.highlightedRow.length; j++){
+      this.highlight(this.highlightedRow[j] + ' ');
+    }
+    //scroll zur richtigen Zeile
+    this.rows = document.querySelectorAll('.mat-row');
+    for (let j = 0; j < this.rows.length; j++) {
+      const designator = this.dataSource[j]['des'];
+      if (this.highlightedRow.includes(designator)) {
+        this.rows[j].parentElement.scrollTop = (this.currentRow) * this.rows[j].getBoundingClientRect().height;
+        break;
+      }
+    }
+  }
+
   //alt: holt Outline mit Komponenten aus PDF
   loadOutline() {
     this.outlineTop = [];
@@ -837,7 +854,7 @@ export class PdfComponent implements OnInit {
 //    this.changeData();
   }
 
-  //öffnet InfoDialog über gesamnten Vorgang
+  //öffnet InfoDialog über gesamten Vorgang
   //TO-DO: noch mehr Info wie z.B. Modellnummer u.Ä. reinpacken (alles was nicht in GUI einsehbar)
   moreInfo(){
     this.addInfo = [];
@@ -905,6 +922,14 @@ export class PdfComponent implements OnInit {
     new Promise(resolve => setTimeout(() => resolve(), 1000))
       .then(() => {
           this.changeData();
+          if(this.formID!==undefined){
+            for(let i=0; i<this.formulare.length; i++){
+              if(this.formulare[i].id===this.formID){
+                this.loadForm(this.formulare[i]);
+                break;
+              }
+            }
+          }
         })
       .catch((err) => console.error('p2', err));
   }
