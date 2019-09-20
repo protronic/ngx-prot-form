@@ -551,11 +551,10 @@ export class PdfComponent implements OnInit {
   //Hole also Des aus String und füge entsprechende Kopmonenten zu Array hinzu
   convertComps(s: string){
     const liste = s.split('"');
-    const comp = {pos: '', des: '', quan: '', art: '', match: ''};
     this.changedComps = [];
-    for(let i=1; i<liste.length; i++){
-      if(liste[i] === 'des'){
-        const des = liste[i+2];
+    for(let i=1; i<liste.length-1; i++){
+      if(liste[i] !== ','){
+        const des = liste[i];
         for (let j = 0; j < this.dataSource.length; j++) {
           if (this.dataSource[j]['des'] === des) {
             this.changedComps.push(this.dataSource[j]);
@@ -1149,11 +1148,20 @@ export class PdfComponent implements OnInit {
     registerLocaleData(localeDe);
     const pipe = new DatePipe('de');
     const date = pipe.transform(now, 'medium');
+    let comp='';
+    if(this.changedComps.length!==0){
+      //sortiere nach Designator
+      this.changedComps.sort(function(a,b) {return a['des']<b['des'] ? -1:1;});
+      comp = this.changedComps[0]['des'];
+      for(let i=1; i<this.changedComps.length; i++){
+        comp+= ', ' + this.changedComps[i]['des'];
+      }
+    }
     const item = {
         'Platinennummer': platine,
         'Auftragsnummer': this.fertigung[0]['Fertigungsauftragsnummerbc'],
         'Fehlerbeschreibung': '',
-        'betrachtete_Komponenten': this.changedComps,
+        'betrachtete_Komponenten': comp,
         'Benutzer': this.username,
         'Artikelnummer': this.article,
         'Datum': date,
@@ -1177,10 +1185,19 @@ export class PdfComponent implements OnInit {
     registerLocaleData(localeDe);
     const pipe = new DatePipe('de');
     const date = pipe.transform(now, 'medium');
+    let comp='';
+    if(this.changedComps.length!==0){
+      //sortiere nach Designator
+      this.changedComps.sort(function(a,b) {return a['des']<b['des'] ? -1:1;});
+      comp = this.changedComps[0]['des'];
+      for(let i=1; i<this.changedComps.length; i++){
+        comp+= ', ' + this.changedComps[i]['des'];
+      }
+    }
     const item = {
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
-        'betrachtete_Komponenten': this.changedComps,
+        'betrachtete_Komponenten': comp,
         'Benutzer': this.username,
         'Artikelnummer': this.article,
         'Datum': date,
@@ -1203,10 +1220,19 @@ export class PdfComponent implements OnInit {
     registerLocaleData(localeDe);
     const pipe = new DatePipe('de');
     const date = pipe.transform(now, 'medium');
+    let comp='';
+    if(this.changedComps.length!==0){
+      //sortiere nach Designator
+      this.changedComps.sort(function(a,b) {return a['des']<b['des'] ? -1:1;});
+      comp = this.changedComps[0]['des'];
+      for(let i=1; i<this.changedComps.length; i++){
+        comp+= ', ' + this.changedComps[i]['des'];
+      }
+    }
     const item = {
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
-        'betrachtete_Komponenten': this.changedComps,
+        'betrachtete_Komponenten': comp,
         'Benutzer': this.username,
         'Artikelnummer': this.article,
         'Datum': date,
