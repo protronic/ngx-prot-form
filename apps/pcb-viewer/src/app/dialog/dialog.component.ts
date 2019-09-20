@@ -20,6 +20,8 @@ export class DialogComponent implements OnInit {
   form: boolean;
   noForms: boolean;
   platine: string;
+  comment: string;
+  formID: string;
   display= ['Id', 'Platine', 'Art', 'Time'];
   headers: string[] = ['Designator', 'Quantity', 'Comment', 'Matchcode', 'Lieferant', 'HArtikelnummer', 'Hersteller', 'Einzelpreis']; // maybe
 
@@ -32,6 +34,8 @@ export class DialogComponent implements OnInit {
     this.form = false;
     this.noForms = false;
     this.platine='';
+    this.comment='';
+    this.formID='';
     if(this.art==='Component'){
       this.selectedText = data[1];
       this.article = data[2];
@@ -41,6 +45,9 @@ export class DialogComponent implements OnInit {
       this.comp=data[1];
       this.bestueckung = data[2];
       this.reparatur = !data[2];
+      this.platine = data[3];
+      this.comment = data[4];
+      this.formID = data[5];
     }else if(this.art==='Choose'){
       this.formulare = data[1];
       this.choose = true;

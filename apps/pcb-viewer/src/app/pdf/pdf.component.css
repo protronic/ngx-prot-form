@@ -27,7 +27,7 @@
 .upper {
   overflow: auto;
   overflow-y: scroll;
-  height: 40vh;
+  height: 55vh;
 }
 
 .lower {

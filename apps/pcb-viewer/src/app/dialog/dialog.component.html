@@ -1,14 +1,14 @@
 
 <h2 mat-dialog-title *ngIf=component> Mehr Information </h2>
 <h2 mat-dialog-title *ngIf=bestueckung> Aktueller Bestückungsvorgang </h2>
-<h2 mat-dialog-title *ngIf=reparatur> Aktueller Raparaturvorgang </h2>
+<h2 mat-dialog-title *ngIf=reparatur> Aktueller Reparaturvorgang </h2>
 <h2 mat-dialogue-title *ngIf=choose> Modell auswählen </h2>
 <h2 mat-dialogue-title *ngIf=form> Platinen-Nummer eingeben </h2>
 <h2 *ngIf=noForms> Es wurden keine Formulare gefunden </h2>
 <p *ngIf=choose> bitte warten, bis PDF und Tabelle im Hintergrund vollständig geladen sind </p>
 
 <div *ngIf="reparatur||bestueckung||component">
-  <mat-dialog-content [style.height.px]="'250'">
+  <mat-dialog-content class = "content">
 	  <ul *ngFor="let line of comp">
 		  <li><h3> {{line}} </h3>
 		  </li>
@@ -17,7 +17,7 @@
 </div>
 
 <div *ngIf=choose>
-  <mat-dialog-content [style.height.px]="'250'">
+  <mat-dialog-content class="content">
     <mat-table [dataSource]=formulare>
       <ng-container matColumnDef="Id">
         <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
@@ -46,13 +46,13 @@
 </div>
 
 <div *ngIf="form">
-  <mat-dialog-content [style.height.px]="'250'">
+  <mat-dialog-content [style.height.px]="110">
     <form #form="ngForm">
       <mat-form-field [style.width.px]="400">
         <input matInput placeholder="Platinen-Nummer" [(ngModel)]="platine" name="Platinennummer" required>
         <mat-error *ngIf="platine === ''"> Platinen-Nummer benötigt </mat-error>
       </mat-form-field>
-      <button mat-raised-button
+      <button mat-raised-button class="margin"
               (click)="close(platine)"
               [disabled]="platine===''"> OK </button>
       <button mat-raised-button
@@ -61,7 +61,17 @@
   </mat-dialog-content>
 </div>
 
-<mat-dialog-actions>
-  <button mat-raised-button (click)="close()" color="primary">Close</button>
+<mat-dialog-actions *ngIf="!(bestueckung||reparatur)">
+  <button mat-raised-button (click)="close()" color="primary">Schließen</button>
 </mat-dialog-actions>
-
+<mat-dialog-actions *ngIf="bestueckung||reparatur">
+  <button mat-raised-button (click)="close('new')" color="primary" class="margin"
+    [disabled]="platine===''||(reparatur&&comment==='')">
+    Neues Formular
+  </button>
+  <button mat-raised-button (click)="close('update')" color="primary" class="margin"
+    [disabled]="bestueckung||platine===''||(reparatur&&comment==='')||this.formID===undefined">
+    Update
+  </button>
+  <button mat-raised-button (click)="close()" color="primary" class="margin right">Schließen</button>
+</mat-dialog-actions>

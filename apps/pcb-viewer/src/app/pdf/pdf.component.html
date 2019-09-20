@@ -97,19 +97,11 @@
 				<mat-error *ngIf="comment===''"> Fehlerbeschreibung benötigt </mat-error>
 			</mat-form-field>
 			<button mat-raised-button
-				(click)="submitR(platine, comment)"
+				(click)="moreInfo()"
 				color="primary"
-        [disabled]="comment===''||platine===''||(!reparatur)||loginstatus==='anonym'||loginstatus==='anonymous'"
-        class="margin">
-				Neues Formular
-      </button>
-      <button mat-raised-button
-        (click)="update(platine, comment)"
-        color="primary"
-        [disabled]="comment===''||comment===null||platine===''||(!reparatur)||loginstatus==='anonym'||loginstatus==='anonymous'||formID===''"
-        class="margin">
-        Update
-      </button>
+				[disabled]="platine===''||comment===''">
+				Absenden
+			</button>
     </form>
 
     <form [style.margin.px]="10" #form="ngForm" *ngIf = bestueckung class="column middle">
@@ -121,9 +113,9 @@
 				<mat-error *ngIf="platine === ''"> Platinennummer benötigt </mat-error>
       </mat-form-field>
 			<button mat-raised-button
-				(click)="submitB(platine)"
+				(click)="moreInfo()"
 				color="primary"
-				[disabled]="platine===''||(!bestueckung)||loginstatus==='anonym'||loginstatus==='anonymous'">
+				[disabled]="platine===''||(!bestueckung)">
 				Absenden
 			</button>
     </form>

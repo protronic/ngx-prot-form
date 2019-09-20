@@ -138,7 +138,7 @@ export class PdfComponent implements OnInit {
         &&((this.jsonFile[i]['ImportID']==="1"&&this.showSMD)||(this.jsonFile[i]['ImportID']==="2"&&this.showTHT)||(!this.showTHT&&!this.showSMD))) {
 //          console.log(selectedText + ' found at row ' + i.toString());
           if (this.showBoth) {
-             this.dialog.open(DialogComponent, {height: '45%',
+             this.dialog.open(DialogComponent, {height: '500px',
                                                 width: '30%',
                                                 'data': ['Component', selectedText, this.article, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText)) ]});
           }
@@ -185,7 +185,7 @@ export class PdfComponent implements OnInit {
             &&((this.jsonFile[i]['ImportID']==="1"&&this.showSMD)||(this.jsonFile[i]['ImportID']==="2"&&this.showTHT)||(!this.showTHT&&!this.showSMD))) {
 //              console.log(selectedText + ' found at row ' + i.toString());
               if (this.showBoth) {
-                this.dialog.open(DialogComponent, {height: '45%',
+                this.dialog.open(DialogComponent, {height: '500px',
                                                    width: '30%',
                                                    'data': ['Component', selectedText, this.article, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText)) ]});
               }
@@ -224,7 +224,6 @@ export class PdfComponent implements OnInit {
   }
 
   @HostListener('document:keydown', ['$event']) keyPressed(event: KeyboardEvent) {
-    //andere Taste wegen schreiben?
     if (event.key === 'Enter') {
       this.enter();
     }
@@ -483,14 +482,14 @@ export class PdfComponent implements OnInit {
 
   //Zeige Formulare mit bestimmter PlatinenNr zur Auswahl an und lade danach ausgewähltes
   chooseForm(){
-    const dialogRef = this.dialog.open(DialogComponent, {height: '45%',
-                                         width: '30%',
+    const dialogRef = this.dialog.open(DialogComponent, {height: '300px',
+                                         width: '600px',
                                          'data': ['Form']});
     const data = [];
     dialogRef.afterClosed().subscribe(result => {
       if(result==='all'){
         if(this.formulare.length>0){
-          const dialog = this.dialog.open(DialogComponent, {height: '45%',
+          const dialog = this.dialog.open(DialogComponent, {height: '500px',
                                          width: '30%',
                                          'data': ['Choose', this.formulare]});
           dialog.afterClosed().subscribe(res => {
@@ -508,7 +507,7 @@ export class PdfComponent implements OnInit {
                                          'data': ['NoForms']});
         }
 
-      } else{
+      } else if(result!==undefined){
         this.platine = result;
         for(let i=0; i<this.formulare.length; i++){
           if(this.formulare[i].platinenNr === this.platine){
@@ -516,7 +515,7 @@ export class PdfComponent implements OnInit {
           }
         }
         if(data.length>0){
-          const dialog = this.dialog.open(DialogComponent, {height: '45%',
+          const dialog = this.dialog.open(DialogComponent, {height: '500px',
                                          width: '30%',
                                          'data': ['Choose', data]});
           dialog.afterClosed().subscribe(res => {
@@ -887,10 +886,10 @@ export class PdfComponent implements OnInit {
   //TO-DO: noch mehr Info wie z.B. Modellnummer u.Ä. reinpacken (alles was nicht in GUI einsehbar)
   moreInfo(){
     this.addInfo = [];
-    this.addInfo.push('Artikelname: ' + this.articleName);
+    if(this.articleName!==undefined) this.addInfo.push('Artikelname: ' + this.articleName);
     this.addInfo.push('Artikelnummer: ' + this.article);
-    this.addInfo.push('Benutzer: ' + this.username);
-    this.addInfo.push('Login-Status: ' + this.loginstatus);
+    if(this.username!==undefined) this.addInfo.push('Benutzer: ' + this.username);
+    if(this.loginstatus!==undefined) this.addInfo.push('Login-Status: ' + this.loginstatus);
     if(this.changedComps.length!==0){
       //sortiere nach Designator
       this.changedComps.sort(function(a,b) {return a['des']<b['des'] ? -1:1;});
@@ -900,11 +899,27 @@ export class PdfComponent implements OnInit {
       }
       this.addInfo.push('Betrachtete Komponeneten: ' + comp);
     }
+    if(this.bestueckung) this.addInfo.push('Auftragsnummer: ' + this.fertigung[0]['Fertigungsauftragsnummerbc']);
+    if(this.platine!=='') this.addInfo.push('Platinen-Nummer: '  + this.platine);
+    if(this.reparatur&&this.comment!=='') this.addInfo.push('Fehlerbeschreibung: ' + this.comment);
+    this.addInfo.push('Seite: ' + (this.pageNr===1 ? 'Top' : 'Bottom'));
+    this.addInfo.push('Zeile: ' + (this.currentRow>-1 ? this.currentRow : 'keine'));
+    this.addInfo.push('hervorgehoben: '+ (this.highlightedRow[0]!=='' ? this.highlightedRow.join() : 'nichts'));
 
-    if(this.bestueckung) this.addInfo.push('Auftragsnummer. ' + this.fertigung[0]['Fertigungsauftragsnummerbc']);
-    this.dialog.open(DialogComponent, {height: '45%',
+    const dialogRef = this.dialog.open(DialogComponent, {height: '500px',
                                        width: '30%',
-                                       'data':['Article', this.addInfo, this.bestueckung]});
+                                       'data':['Article', this.addInfo, this.bestueckung, this.platine, this.comment, this.formID]});
+    dialogRef.afterClosed().subscribe(result =>{
+      if(result==='new'){
+        if(this.bestueckung){
+          this.submitB(this.platine);
+        }else if(this.reparatur){
+          this.submitR(this.platine, this.comment);
+        }
+      }else if(result==='update'&&this.reparatur){
+        this.update(this.platine, this.comment);
+      }
+    })
   }
 
   //alt: aufgerufen, um eine Komponente hervorzuheben

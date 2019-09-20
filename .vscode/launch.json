@@ -9,7 +9,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "Launch Chrome against localhost",
-      "url": "http://localhost:4200/index.html?artikelnummer=0603000307&model=20382",
+      "url": "http://localhost:4200/index.html?artikelnummer=0603000307&username=huhu&loginstatus=anonym",
       "webRoot": "${workspaceFolder}/apps/pcb-viewer",
       "sourceMaps": true
     }
