@@ -36,6 +36,7 @@ export interface Formular {
   parentForm: string;
   platinenNr: string;
   comment: string;
+  user: string;
   log: JSON;
 }
 
@@ -154,7 +155,7 @@ export class PdfComponent implements OnInit {
           }
           //scrolling to currentRow
           for (let j = 0; j < this.rows.length; j++) {
-            const designator = this.dataSource[j]['des'];
+            const designator = this.currentData[j]['des'];
             if (this.highlightedRow.includes(designator)) {
               this.rows[j].parentElement.scrollTop = (this.currentRow) * this.rows[j].getBoundingClientRect().height;
               break;
@@ -201,7 +202,7 @@ export class PdfComponent implements OnInit {
               }
               //scrolling to currentRow
               for (let j = 0; j < this.rows.length; j++) {
-                const designator = this.dataSource[j]['des'];
+                const designator = this.currentData[j]['des'];
                 if (this.highlightedRow.includes(designator)) {
                   this.rows[j].parentElement.scrollTop = (this.currentRow) * this.rows[j].getBoundingClientRect().height;
                   break;
@@ -238,6 +239,7 @@ export class PdfComponent implements OnInit {
         .subscribe(params => {
           this.article = params.artikelnummer;
           this.loginstatus = params.loginstatus;
+          this.articleName = params.artikelname;
           this.username = params.username;
           this.formID = params.model;
           if (this.article !== undefined ) {
@@ -268,6 +270,7 @@ export class PdfComponent implements OnInit {
                   parentForm: entry['parentForm'],
                   platinenNr: entry['platinenNr'],
                   comment: entry['comment'],
+                  user: entry['user'],
                   log: entry['log']
                 }));
               })
@@ -328,6 +331,57 @@ export class PdfComponent implements OnInit {
     this.isLoaded = true;
     this.loadOutline();
     this.totalPages = pdf.numPages;
+  }
+
+  back(){
+    if(this.bestueckung){
+      if(this.currentData===undefined) this.currentData=this.filterDataSource();
+      this.clearAll();
+      if(this.currentRow>-1 && this.currentRow<this.currentData.length){
+        this.currentRow--;
+        const art = this.currentData[this.currentRow]['art'];
+        while(this.currentRow>-1&&this.currentData[this.currentRow]['art']===art){
+          this.currentRow--;
+        }
+        this.currentRow++;
+      }else if(this.currentRow>-1){
+        this.currentRow--;
+      }
+
+      if (this.currentRow<this.currentData.length&&this.currentRow>-1){
+        this.highlightedRow[0] = this.currentData[this.currentRow]['des'];
+      } else{
+        this.highlightedRow[0]='';
+      }
+      this.highlight(this.highlightedRow[0]+' ');
+
+      //scrolling und highlighting
+      new Promise(resolve => setTimeout(() => resolve(), 500))
+        .then(() => {
+          this.rows = document.querySelectorAll('.mat-row');
+          for (let i = 0; i < this.rows.length; i++) {
+            const designator = this.currentData[i]['des'];
+            if (this.highlightedRow.includes(designator)) {
+              this.rows[i].parentElement.scrollTop = (this.currentRow) * this.rows[i].getBoundingClientRect().height;
+              break;
+            }
+          }
+
+          if (!this.hasComps) {
+            this.getComps();
+          }
+          let change = false;
+          if(!this.selectMultiple){
+            change = true;
+            this.selectMultiple = true;
+          }
+          if (this.bestueckung) this.highlightBezeichnerListe(this.highlightedRow[0]);
+          if(change){
+            this.selectMultiple = false;
+          }
+        })
+        .catch((err) => (console.error('p1', err)));
+    }
   }
 
   //gibt Hingtergrundfarbe für Reihe wieder, in Referenz zu highlightedRow
@@ -585,7 +639,7 @@ export class PdfComponent implements OnInit {
       this.clearAll();
 
       //falls man alle Komponenten mit der gelichen Artikelnummer auswählt, wird gleich zum nächsten mit anderer Artikelnummer weitergegangen
-      if(this.currentRow!==-1 && this.bestueckung && this.currentRow<this.currentData.length){
+      if(this.currentRow>-1 && this.currentRow<this.currentData.length){
         const art = this.currentData[this.currentRow]['art'];
         while(this.currentRow<this.currentData.length && this.currentData[this.currentRow]['art']===art){
           this.currentRow++;
@@ -606,7 +660,7 @@ export class PdfComponent implements OnInit {
         .then(() => {
           this.rows = document.querySelectorAll('.mat-row');
           for (let i = 0; i < this.rows.length; i++) {
-            const designator = this.dataSource[i]['des'];
+            const designator = this.currentData[i]['des'];
             if (this.highlightedRow.includes(designator)) {
               this.rows[i].parentElement.scrollTop = (this.currentRow) * this.rows[i].getBoundingClientRect().height;
               break;
@@ -755,7 +809,7 @@ export class PdfComponent implements OnInit {
     //scroll zur richtigen Zeile
     this.rows = document.querySelectorAll('.mat-row');
     for (let j = 0; j < this.rows.length; j++) {
-      const designator = this.dataSource[j]['des'];
+      const designator = this.currentData[j]['des'];
       if (this.highlightedRow.includes(designator)) {
         this.rows[j].parentElement.scrollTop = (this.currentRow) * this.rows[j].getBoundingClientRect().height;
         break;
@@ -882,7 +936,7 @@ export class PdfComponent implements OnInit {
   }
 
   //öffnet InfoDialog über gesamten Vorgang
-  //TO-DO: noch mehr Info wie z.B. Modellnummer u.Ä. reinpacken (alles was nicht in GUI einsehbar)
+  //lässt Sendung zur Datenbank zu (Default beim Senden)
   moreInfo(){
     this.addInfo = [];
     if(this.articleName!==undefined) this.addInfo.push('Artikelname: ' + this.articleName);
@@ -905,9 +959,9 @@ export class PdfComponent implements OnInit {
     this.addInfo.push('Zeile: ' + (this.currentRow>-1 ? this.currentRow : 'keine'));
     this.addInfo.push('hervorgehoben: '+ (this.highlightedRow[0]!=='' ? this.highlightedRow.join() : 'nichts'));
 
-    const dialogRef = this.dialog.open(DialogComponent, {height: '500px',
+    const dialogRef = this.dialog.open(DialogComponent, {height: '520px',
                                        width: '30%',
-                                       'data':['Article', this.addInfo, this.bestueckung, this.platine, this.comment, this.formID]});
+                                       'data':['Article', this.addInfo, this.bestueckung, this.platine, this.comment, this.formID, this.loginstatus]});
     dialogRef.afterClosed().subscribe(result =>{
       if(result==='new'){
         if(this.bestueckung){

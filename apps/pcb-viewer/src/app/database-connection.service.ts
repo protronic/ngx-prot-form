@@ -58,6 +58,7 @@ export class DatabaseConnectionService {
         JSON_VALUE(log, '$."parentForm"') AS 'parentForm',
         JSON_VALUE(log, '$."Platinennummer"') AS 'platinenNr',
         JSON_VALUE(log, '$."Fehlerbeschreibung"') AS 'comment',
+        JSON_VALUE(log, '$."Benutzer"') AS 'user',
         log
       FROM
         model

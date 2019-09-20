@@ -22,7 +22,8 @@ export class DialogComponent implements OnInit {
   platine: string;
   comment: string;
   formID: string;
-  display= ['Id', 'Platine', 'Art', 'Time'];
+  loginstatus: string;
+  display= ['Id', 'Platine', 'User', 'Art', 'Time'];
   headers: string[] = ['Designator', 'Quantity', 'Comment', 'Matchcode', 'Lieferant', 'HArtikelnummer', 'Hersteller', 'Einzelpreis']; // maybe
 
   constructor(private dialogRef: MatDialogRef<DialogComponent>, @Inject(MAT_DIALOG_DATA) data) {
@@ -36,6 +37,7 @@ export class DialogComponent implements OnInit {
     this.platine='';
     this.comment='';
     this.formID='';
+    this.loginstatus='';
     if(this.art==='Component'){
       this.selectedText = data[1];
       this.article = data[2];
@@ -48,6 +50,7 @@ export class DialogComponent implements OnInit {
       this.platine = data[3];
       this.comment = data[4];
       this.formID = data[5];
+      this.loginstatus = data[6];
     }else if(this.art==='Choose'){
       this.formulare = data[1];
       this.choose = true;

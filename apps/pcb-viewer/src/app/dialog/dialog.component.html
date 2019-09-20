@@ -35,6 +35,10 @@
           <mat-header-cell *matHeaderCellDef> Platinen-Nummer </mat-header-cell>
           <mat-cell *matCellDef="let item"> {{item.platinenNr}} </mat-cell>
       </ng-container>
+      <ng-container matColumnDef="User">
+          <mat-header-cell *matHeaderCellDef> Benutzer </mat-header-cell>
+          <mat-cell *matCellDef="let item"> {{item.user}} </mat-cell>
+      </ng-container>
 
       <mat-header-row *matHeaderRowDef="display; sticky: true"></mat-header-row>
       <mat-row *matRowDef="let row; columns: display;"
@@ -66,12 +70,16 @@
 </mat-dialog-actions>
 <mat-dialog-actions *ngIf="bestueckung||reparatur">
   <button mat-raised-button (click)="close('new')" color="primary" class="margin"
-    [disabled]="platine===''||(reparatur&&comment==='')">
+    [disabled]="platine===''||(reparatur&&comment===''||loginstatus==='anonym')">
     Neues Formular
   </button>
   <button mat-raised-button (click)="close('update')" color="primary" class="margin"
-    [disabled]="bestueckung||platine===''||(reparatur&&comment==='')||this.formID===undefined">
+    [disabled]="bestueckung||platine===''||(reparatur&&comment==='')||formID===undefined||loginstatus==='anonym'">
     Update
   </button>
   <button mat-raised-button (click)="close()" color="primary" class="margin right">Schließen</button>
+  <mat-error *ngIf="loginstatus===''||loginstatus==='anonym'" class="error"> Sie müssen zum Senden von Daten eingeloggt sein </mat-error>
+  <mat-error *ngIf="platine===''" class="error"> Platinen-Nummer benötigt </mat-error>
+  <mat-error *ngIf="reparatur&&comment===''" class="error"> Fehlerbeschreibung benötigt </mat-error>
+  <mat-error *ngIf="reparatur&&formID===undefined" class="error"> Update nicht möglich, da kein Formular geladen </mat-error>
 </mat-dialog-actions>
