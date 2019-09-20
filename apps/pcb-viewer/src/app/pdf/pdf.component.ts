@@ -488,25 +488,54 @@ export class PdfComponent implements OnInit {
                                          'data': ['Form']});
     const data = [];
     dialogRef.afterClosed().subscribe(result => {
-      this.platine = result;
-      for(let i=0; i<this.formulare.length; i++){
-        if(this.formulare[i].platinenNr === this.platine){
-          data.push(this.formulare[i]);
-        }
-      }
-      const dialog = this.dialog.open(DialogComponent, {height: '45%',
+      if(result==='all'){
+        if(this.formulare.length>0){
+          const dialog = this.dialog.open(DialogComponent, {height: '45%',
                                          width: '30%',
-                                         'data': ['Choose', data]});
-      dialog.afterClosed().subscribe(res => {
-        this.formID = res;
-        console.log(res);
+                                         'data': ['Choose', this.formulare]});
+          dialog.afterClosed().subscribe(res => {
+            this.formID = res;
+            for(let i=0; i<this.formulare.length; i++){
+              if(this.formulare[i].id===res){
+                this.loadForm(this.formulare[i]);
+                break;
+              }
+            }
+          })
+        }else{
+          const dialog = this.dialog.open(DialogComponent, {height: '20%',
+                                         width: '30%',
+                                         'data': ['NoForms']});
+        }
+
+      } else{
+        this.platine = result;
         for(let i=0; i<this.formulare.length; i++){
-          if(this.formulare[i].id===res){
-            this.loadForm(this.formulare[i]);
-            break;
+          if(this.formulare[i].platinenNr === this.platine){
+            data.push(this.formulare[i]);
           }
         }
-      })
+        if(data.length>0){
+          const dialog = this.dialog.open(DialogComponent, {height: '45%',
+                                         width: '30%',
+                                         'data': ['Choose', data]});
+          dialog.afterClosed().subscribe(res => {
+            this.formID = res;
+            for(let i=0; i<this.formulare.length; i++){
+              if(this.formulare[i].id===res){
+                this.loadForm(this.formulare[i]);
+                break;
+              }
+            }
+          })
+        }else{
+          const dialog = this.dialog.open(DialogComponent, {height: '20%',
+                                         width: '30%',
+                                         'data': ['NoForms']});
+        }
+
+      }
+
     });
 
   }
@@ -922,7 +951,7 @@ export class PdfComponent implements OnInit {
     new Promise(resolve => setTimeout(() => resolve(), 1000))
       .then(() => {
           this.changeData();
-          if(this.formID!==undefined){
+          if(this.formID!==undefined&&this.formulare.length>0){
             for(let i=0; i<this.formulare.length; i++){
               if(this.formulare[i].id===this.formID){
                 this.loadForm(this.formulare[i]);

@@ -4,6 +4,7 @@
 <h2 mat-dialog-title *ngIf=reparatur> Aktueller Raparaturvorgang </h2>
 <h2 mat-dialogue-title *ngIf=choose> Modell auswählen </h2>
 <h2 mat-dialogue-title *ngIf=form> Platinen-Nummer eingeben </h2>
+<h2 *ngIf=noForms> Es wurden keine Formulare gefunden </h2>
 <p *ngIf=choose> bitte warten, bis PDF und Tabelle im Hintergrund vollständig geladen sind </p>
 
 <div *ngIf="reparatur||bestueckung||component">
@@ -30,6 +31,10 @@
           <mat-header-cell *matHeaderCellDef> Zeit </mat-header-cell>
           <mat-cell *matCellDef="let item"> {{item.time}} </mat-cell>
       </ng-container>
+      <ng-container matColumnDef="Platine">
+          <mat-header-cell *matHeaderCellDef> Platinen-Nummer </mat-header-cell>
+          <mat-cell *matCellDef="let item"> {{item.platinenNr}} </mat-cell>
+      </ng-container>
 
       <mat-header-row *matHeaderRowDef="display; sticky: true"></mat-header-row>
       <mat-row *matRowDef="let row; columns: display;"
@@ -50,6 +55,8 @@
       <button mat-raised-button
               (click)="close(platine)"
               [disabled]="platine===''"> OK </button>
+      <button mat-raised-button
+              (click)="close('all')"> zeige alle </button>
     </form>
   </mat-dialog-content>
 </div>
