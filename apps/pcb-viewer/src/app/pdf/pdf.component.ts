@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 import { DatabaseConnectionService } from '../database-connection.service';
+import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 
 export interface OutlineItem {
   pos?: string;
@@ -78,6 +79,7 @@ export class PdfComponent implements OnInit {
   showSMD: boolean;
   showTHT: boolean;
   showBoth: boolean;
+  showInfo: boolean;
   showBot = false;
   showTop = true;
   checkSMD = true;
@@ -90,7 +92,7 @@ export class PdfComponent implements OnInit {
   smallDis = false;
   bigDis = false;
   showPDF = false;
-  highlightedRow: Array<string> = [''];
+  highlightedRow: Array<string> = [];
   currentRow =-1;
   hasRows = false;
   rows: NodeListOf<Element>;
@@ -100,6 +102,7 @@ export class PdfComponent implements OnInit {
   reparatur = false;
   platine = '';
   comment = '';
+  searchedDes: string;
   changedComps: OutlineItem[] = [];
   loginstatus: string;
   username: string;
@@ -138,7 +141,7 @@ export class PdfComponent implements OnInit {
         &&((this.jsonFile[i]['Side']==='TopLayer'&&this.showTop)||(this.jsonFile[i]['Side']==='BottomLayer'&&this.showBot))
         &&((this.jsonFile[i]['ImportID']==="1"&&this.showSMD)||(this.jsonFile[i]['ImportID']==="2"&&this.showTHT)||(!this.showTHT&&!this.showSMD))) {
 //          console.log(selectedText + ' found at row ' + i.toString());
-          if (this.showBoth) {
+          if (this.showInfo) {
              this.dialog.open(DialogComponent, {height: '500px',
                                                 width: '30%',
                                                 'data': ['Component', selectedText, this.article, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText)) ]});
@@ -185,7 +188,7 @@ export class PdfComponent implements OnInit {
             &&((this.jsonFile[i]['Side']==='TopLayer'&&this.showTop)||(this.jsonFile[i]['Side']==='BottomLayer'&&this.showBot))
             &&((this.jsonFile[i]['ImportID']==="1"&&this.showSMD)||(this.jsonFile[i]['ImportID']==="2"&&this.showTHT)||(!this.showTHT&&!this.showSMD))) {
 //              console.log(selectedText + ' found at row ' + i.toString());
-              if (this.showBoth) {
+              if (this.showInfo) {
                 this.dialog.open(DialogComponent, {height: '500px',
                                                    width: '30%',
                                                    'data': ['Component', selectedText, this.article, this.bonus_info.filter(entry => (entry['bezeichnung'] === selectedText)) ]});
@@ -243,14 +246,15 @@ export class PdfComponent implements OnInit {
           this.username = params.username;
           this.formID = params.model;
           if (this.article !== undefined ) {
-            //momentan: für SMD als Standard
+            //momentan: für Reparatur als Standard
             //aufgerufen falls keine Nummer übergeben
             this.showBoth = true;
             this.showSMD = false;
             this.showTHT = false;
             this.reparatur = true;
             this.bestueckung = false;
-            this.selectMultiple = false;
+            this.selectMultiple = true;
+            this.showInfo = true;
 
             //holt alle formulare mit spezifizierter Artikelnummer
             this.db_con.get_formular(this.article)
@@ -448,6 +452,7 @@ export class PdfComponent implements OnInit {
       this.showSMD = false;
       this.showTHT = false;
       this.bestueckung = false;
+      this.selectMultiple = true;
     }
     this.currentData=this.filterDataSource();
   }
@@ -485,6 +490,7 @@ export class PdfComponent implements OnInit {
         this.changedComps = [];
         this.comment = '';
         this.platine = '';
+        this.selectMultiple = false;
       }
       this.reparatur = false;
       this.showTHT = false;
@@ -526,6 +532,7 @@ export class PdfComponent implements OnInit {
         this.changedComps = [];
         this.platine = '';
         this.comment = '';
+        this.selectMultiple = false;
       }
       this.reparatur = false;
       this.showSMD = false;
@@ -943,7 +950,7 @@ export class PdfComponent implements OnInit {
     this.addInfo.push('Artikelnummer: ' + this.article);
     if(this.username!==undefined) this.addInfo.push('Benutzer: ' + this.username);
     if(this.loginstatus!==undefined) this.addInfo.push('Login-Status: ' + this.loginstatus);
-    if(this.changedComps.length!==0){
+    if(this.changedComps.length!==0&&!this.reparatur){
       //sortiere nach Designator
       this.changedComps.sort(function(a,b) {return a['des']<b['des'] ? -1:1;});
       let comp = this.changedComps[0]['des'];
@@ -1056,33 +1063,104 @@ export class PdfComponent implements OnInit {
   //hebt Reihe, sowie benötigte Komponente(n) im PDF hervor
   rowClicked(pos: number, des: string) {
     //  console.log(this.dataSource)
-    if(this.currentData === undefined) this.currentData = this.filterDataSource();
-    pos = Number(pos.toString());
-    for(let i=0; i<this.currentData.length; i++){
-      if(Number(this.currentData[i]['pos'])===pos){
-        this.currentRow=i;
-        break;
+    if(!this.highlightedRow.includes(des)){
+      if(this.currentData === undefined) this.currentData = this.filterDataSource();
+      pos = Number(pos.toString());
+      for(let i=0; i<this.currentData.length; i++){
+        if(Number(this.currentData[i]['pos'])===pos){
+          this.currentRow=i;
+          break;
+        }
       }
-    }
       // this.changeSMD()
       // this.changeTHT()
       // console.log({outlineBot: this.outlineBot, outlineTop: this.outlineTop, smdOutlineBot: this.smdOutlineBot, smdOutlineTop: this.smdOutlineTop, thtOutlineBot: this.thtOutlineBot, thtOutlineTop: this.thtOutlineTop})
-    if (!this.hasComps) {
-      this.getComps();
+      if (!this.hasComps) {
+        this.getComps();
+      }
+      let change = false;
+      if (!this.selectMultiple) {
+        this.clearAll();
+        change = true;
+      }
+      this.highlightedRow.push(des);
+      if(!this.bestueckung){
+        this.highlight(des + ' ');
+      } else {
+        this.selectMultiple = true;
+        this.highlightBezeichnerListe(des);
+        if (change) {
+          this.selectMultiple = false;
+        }
+      }
+    }else{
+      if(this.selectMultiple){
+        const placeholder = [];
+        for(let i=0; i<this.highlightedRow.length; i++){
+          if(this.highlightedRow[i]!==des){
+            placeholder.push(this.highlightedRow[i]);
+          }
+        }
+        this.highlightedRow = placeholder;
+        for (let i = 0; i < document.querySelector('.textLayer').querySelectorAll('span').length; i++) {
+          this.renderer.removeStyle(document.querySelector('.textLayer').querySelectorAll('span')[i], 'background-color');
+        }
+        for(let i=0; i<this.highlightedRow.length; i++){
+          this.highlight(this.highlightedRow[i]+' ');
+        }
+      }
+
     }
-    let change = false;
-    if (!this.selectMultiple) {
-      this.clearAll();
-      change = true;
-    }
-    this.highlightedRow.push(des);
-    if(!this.bestueckung){
-      this.highlight(des + ' ');
-    } else {
-      this.selectMultiple = true;
-      this.highlightBezeichnerListe(des);
-      if (change) {
-        this.selectMultiple = false;
+
+  }
+
+  //sucht nach bestimmten Designator und highlighted diesen (springt falls benötigt auf andere Seite)
+  search(des: string){
+    for(let i=0; i<this.jsonFile.length; i++){
+      const designators = this.jsonFile[i]['Designator'];
+      if(designators.includes(des + ', ') || designators.includes(', ' + des) || designators === des){
+        //wechsle Seite, falls nötig
+        if(this.jsonFile[i]['Side']==='TopLayer'){
+          this.pageNr =1;
+          this.showTop=true;
+          this.showBot=false;
+        }else{
+          this.pageNr=2;
+          this.showBot=true;
+          this.showTop=false;
+        }
+        this.changeData();
+        this.currentData=this.filterDataSource();
+        //getting current row
+        for(let j=0; j<this.currentData.length; j++){
+          if(this.currentData[j].des===des){
+            this.currentRow = j;
+            break;
+          }
+        }
+        //highlight in PDf
+        if (!this.hasComps) {
+          this.getComps();
+        }
+        if(!this.selectMultiple){
+          this.highlightedRow = [];
+          this.clearAll();
+        }
+        this.highlightedRow.push(des);
+        //scrolling
+        this.rows = document.querySelectorAll('.mat-row');
+        for (let j = 0; j < this.rows.length; j++) {
+          const designator = this.currentData[j]['des'];
+          if (this.highlightedRow.includes(designator)) {
+            this.rows[j].parentElement.scrollTop = (this.currentRow) * this.rows[j].getBoundingClientRect().height;
+            break;
+          }
+        }
+        //highlighted bei Seitenwechsel an falscher Stelle: vllt weil Seite noch nicht geladen?
+        if(this.pageRendered){
+          this.highlight(des + ' ');
+        }
+        break;
       }
     }
   }

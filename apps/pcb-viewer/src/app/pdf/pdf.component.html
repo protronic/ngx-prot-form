@@ -4,9 +4,29 @@
 
 <div *ngIf="showPDF">
 
-  <button mat-icon-button (click)="moreInfo()" [style.color]="'#9C27B0'">
-    <mat-icon> more_vert </mat-icon>
+  <button mat-icon-button [matMenuTriggerFor]="menu" color="primary" class="margin">
+      <mat-icon> more_vert </mat-icon>
   </button>
+
+  <mat-menu #menu="matMenu" >
+    <button mat-menu-item (click)="moreInfo()" [style.color]="'white'" [style.background-color]="'#607D8B'">
+        <span> Information </span>
+    </button>
+    <button mat-menu-item
+      (click)="chooseForm()"
+      [style.background-color]="'#455A64'"
+      [style.color]="'white'"
+      [disabled]="loginstatus==='anonym'||loginstatus===''">
+      lade Formular
+    </button>
+    <button mat-menu-item [style.background-color]="'#607D8B'" [style.color]="'white'" (click)="showAttach('Wiki')">
+      <span> Wiki </span>
+    </button>
+    <button mat-menu-item [style.background-color]="'#455A64'" [style.color]="'white'" (click)="showAttach('PDF')">
+      <span> ursprüngliches PDF </span>
+    </button>
+  </mat-menu>
+
   <mat-checkbox color="primary" class="margin" [checked]="selectMultiple" (change)="changeMultiple()"> Mehrfachselektion </mat-checkbox>
 	<button mat-raised-button (click)="clearAll()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin"> löschen </button>
 	<!-- <mat-checkbox [checked]="checkSMD" (change)="changeSMD()" color="primary" class="margin"> show SMD </mat-checkbox>
@@ -17,26 +37,18 @@
 	<button mat-raised-button (click)="big()" color ="accent" class="margin" [disabled]="bigDis"> + </button>
 
 	<span [style.margin]="'15px'"></span>
-	<button mat-raised-button (click)="prev(true)" color="primary" class ="margin" [disabled]="prevDis"> vorherige </button>
-	<button mat-raised-button (click)="next(true)" color="primary" class ="margin" [disabled]="nextDis"> nächste </button>
+	<button mat-raised-button (click)="prev(true)" color="primary" class ="margin" [disabled]="showTop"> Top </button>
+  <button mat-raised-button (click)="next(true)" color="primary" class ="margin" [disabled]="showBot"> Bottom </button>
+
+  <span [style.margin]="'15px'"></span>
+  <mat-checkbox [checked]="showInfo" (change)="showInfo=!showInfo"> Infofenster </mat-checkbox>
 
 
-	<button mat-icon-button [matMenuTriggerFor]="menu" color="primary" class="margin rightButton">
-  		<mat-icon> more_vert </mat-icon>
-	</button>
-  <mat-menu #menu="matMenu" >
-		<button mat-menu-item [style.background-color]="'#B0BEB0'" (click)="showAttach('Wiki')">
-			<span> Wiki </span>
-    </button>
-    <button mat-menu-item [style.background-color]="'#B0BEB0'" (click)="showAttach('PDF')">
-        <span> ursprüngliches PDF </span>
-    </button>
-  </mat-menu>
 
 
   <button mat-raised-button (click)="enter()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin rightButton"> weiter </button>
   <button mat-raised-button (click)="back()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin rightButton"> zurück </button>
-  <button mat-raised-button (click)="chooseForm()" color="primary" class="margin rightButton"> lade Formular </button>
+
 	<mat-divider [style.margin.px]="'5'"></mat-divider>
 
 <!-- 	<mat-card *ngIf="showBoth" [style.width.px]="'150'" [style.height.vh]="'80'" [style.overflow]="'auto'" class="column middle">
@@ -84,11 +96,15 @@
 		</mat-table>
 
     <mat-divider [style.margin.px]="5"></mat-divider>
+    <div [style.margin]="'5px'">
+      <mat-checkbox color="primary" class="margin" [checked]="showTHT" (change)="changeTht()"> THT Bestückung </mat-checkbox>
+      <mat-checkbox color="primary" class="margin" [checked]="showSMD" (change)="changeSmd()"> SMD  Suche </mat-checkbox>
+      <mat-checkbox color="primary" class="margin" [checked]="reparatur" (change)="changeRep()"> Reparatur/Nachbearbeitung </mat-checkbox>
+    </div>
+
+    <mat-divider [style.margin.px]="5"></mat-divider>
 
 		<form [style.margin.px]="10" #form="ngForm" *ngIf = reparatur class="column middle">
-			<mat-checkbox color="primary" class="margin" [checked]="showTHT" (change)="changeTht()"> THT </mat-checkbox>
-			<mat-checkbox color="primary" class="margin" [checked]="showSMD" (change)="changeSmd()"> SMD </mat-checkbox>
-			<mat-checkbox color="primary" class="margin" [checked]="reparatur" (change)="changeRep()"> Reparatur/Nachbearbeitung </mat-checkbox>
 			<mat-form-field [style.width.px]="400">
 				<input matInput placeholder="Platinennummer" [(ngModel)]="platine" name="Platinennummer" required>
 				<mat-error *ngIf="platine === ''"> Platinennummer benötigt </mat-error>
@@ -106,9 +122,6 @@
     </form>
 
     <form [style.margin.px]="10" #form="ngForm" *ngIf = bestueckung class="column middle">
-			<mat-checkbox color="primary" class="margin" [checked]="showTHT" (change)="changeTht()"> THT </mat-checkbox>
-			<mat-checkbox color="primary" class="margin" [checked]="showSMD" (change)="changeSmd()"> SMD </mat-checkbox>
-			<mat-checkbox color="primary" class="margin" [checked]="reparatur" (change)="changeRep()"> Reparatur/Nachbearbeitung </mat-checkbox>
 			<mat-form-field [style.width.px]="400">
 				<input matInput placeholder="Platinennummer" [(ngModel)]="platine" name="Platinennummer" required>
 				<mat-error *ngIf="platine === ''"> Platinennummer benötigt </mat-error>
@@ -118,8 +131,19 @@
 				color="primary"
 				[disabled]="platine===''||(!bestueckung)">
 				Absenden
-			</button>
+      </button>
+      <mat-divider [style.margin.px]="5"></mat-divider>
+      <mat-form-field [style.width.px]="400" [style.margin.px]="10">
+          <input matInput placeholder="Designator" [(ngModel)]="searchedDes" name="Designator">
+        </mat-form-field>
+        <button mat-raised-button
+                (click)="search(searchedDes)"
+                color="primary"
+                [disabled]="searchedDes===''||searchedDes===undefined">
+        Suchen
+        </button>
     </form>
+
 	</mat-card>
 	<!-- <mat-card *ngIf="showBoth" class="column middle">
 		<div *ngIf="showTop">
