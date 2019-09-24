@@ -8,11 +8,10 @@ import { HttpClient } from '@angular/common/http';
 import {MatDialog, MatDialogConfig, MatTableDataSource, MatTable} from '@angular/material';
 import {MatSort} from '@angular/material/sort';
 import {Sort} from '@angular/material/sort';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 import { DatabaseConnectionService } from '../database-connection.service';
-import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 
 export interface OutlineItem {
   pos?: string;
@@ -234,7 +233,7 @@ export class PdfComponent implements OnInit {
   }
 
   constructor(private renderer: Renderer2, private httpService: HttpClient, private dialog: MatDialog, private route: ActivatedRoute,
-              private db_con: DatabaseConnectionService) {
+              private db_con: DatabaseConnectionService, private router: Router) {
   }
 
   //holt Daten und setzt StandardEinstellungen
@@ -825,6 +824,16 @@ export class PdfComponent implements OnInit {
         break;
       }
     }
+    this.router.navigate(
+      [],
+      {
+        relativeTo: this.route,
+        queryParams: {artikelname: this.articleName,
+                      model: this.formID
+                    },
+        queryParamsHandling: 'merge'
+      }
+    );
   }
 
   //alt: holt Outline mit Komponenten aus PDF
