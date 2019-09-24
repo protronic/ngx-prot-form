@@ -16,6 +16,7 @@ import {MatInputModule} from '@angular/material/input';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSortModule} from '@angular/material/sort';
+import {MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
@@ -53,6 +54,7 @@ const appRoutes: Routes = [{
     MatMenuModule,
     MatIconModule,
     MatSortModule,
+    MatSelectModule,
     FormsModule,
     RouterModule.forRoot(appRoutes)
   ],

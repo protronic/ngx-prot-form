@@ -108,6 +108,7 @@ export class PdfComponent implements OnInit {
   addInfo: string[];
   platinenNr: string;
   formID: string;
+  commonErrors= ['Kurzschluss beim Löten', 'nicht gelötet' ,'Bauteil gedreht'];
 
   @ViewChild(MatTable, {static:false}) table: MatTable<any>;
 
@@ -329,6 +330,18 @@ export class PdfComponent implements OnInit {
  * @param pdf
  */
 
+ //fügt Error im Textfeld Fehlerbeschreibung hinzu
+  addError(error: string){
+    if(!this.comment.includes(error)){
+      if(this.comment!==''||this.comment!==undefined){
+        this.comment = this.comment + '\n' + error + ': ';
+      }else{
+        this.comment = error + ': ';
+      }
+
+    }
+  }
+
   //ausgeführt nachdem PDF geladen
   afterLoadComplete(pdf: PDFDocumentProxy) {
     this.pdf = pdf;
@@ -337,6 +350,7 @@ export class PdfComponent implements OnInit {
     this.totalPages = pdf.numPages;
   }
 
+  //geht eine Zeile zurück (bzw bis zum letzten Bauteil mit anderer Artikelnummer)
   back(){
     if(this.bestueckung){
       if(this.currentData===undefined) this.currentData=this.filterDataSource();

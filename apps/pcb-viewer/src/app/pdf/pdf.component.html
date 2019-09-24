@@ -123,9 +123,17 @@
 			<mat-form-field [style.width.px]="400">
 				<input matInput placeholder="Platinennummer" [(ngModel)]="platine" name="Platinennummer" required>
 				<mat-error *ngIf="platine === ''"> Platinennummer benötigt </mat-error>
-			</mat-form-field>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label> häufige Fehler </mat-label>
+        <mat-select>
+          <mat-option *ngFor="let item of commonErrors" [value]="item" (click)="addError(item)" [disabled]="comment.includes(item)">
+            {{item}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 			<mat-form-field [style.width.px]="400">
-				<textarea matInput placeholder="Fehlerbeschreibung" [style.height.vh]="10" [(ngModel)]="comment" name="Comment" required></textarea>
+				<textarea matInput placeholder="Fehlerbeschreibung" [(ngModel)]="comment" name="Comment" required></textarea>
 				<mat-error *ngIf="comment===''"> Fehlerbeschreibung benötigt </mat-error>
 			</mat-form-field>
 			<button mat-raised-button
