@@ -92,7 +92,7 @@ export class PdfComponent implements OnInit {
   smallDis = false;
   bigDis = false;
   showPDF = false;
-  highlightedRow: Array<string> = [];
+  highlightedRow: Array<string> = [''];
   currentRow =-1;
   hasRows = false;
   rows: NodeListOf<Element>;
@@ -344,11 +344,12 @@ export class PdfComponent implements OnInit {
       this.clearAll();
       if(this.currentRow>-1 && this.currentRow<this.currentData.length){
         this.currentRow--;
-        const art = this.currentData[this.currentRow]['art'];
+        let art='';
+        if(this.currentRow>-1) art = this.currentData[this.currentRow]['art'];
         while(this.currentRow>-1&&this.currentData[this.currentRow]['art']===art){
           this.currentRow--;
         }
-        this.currentRow++;
+        if(this.currentRow!==-1) this.currentRow++;
       }else if(this.currentRow>-1){
         this.currentRow--;
       }
@@ -358,7 +359,6 @@ export class PdfComponent implements OnInit {
       } else{
         this.highlightedRow[0]='';
       }
-      this.highlight(this.highlightedRow[0]+' ');
 
       //scrolling und highlighting
       new Promise(resolve => setTimeout(() => resolve(), 500))
@@ -966,7 +966,12 @@ export class PdfComponent implements OnInit {
     if(this.reparatur&&this.comment!=='') this.addInfo.push('Fehlerbeschreibung: ' + this.comment);
     this.addInfo.push('Seite: ' + (this.pageNr===1 ? 'Top' : 'Bottom'));
     this.addInfo.push('Zeile: ' + (this.currentRow>-1 ? this.currentRow : 'keine'));
-    this.addInfo.push('hervorgehoben: '+ (this.highlightedRow.length!==0? this.highlightedRow.sort().join() : 'nichts'));
+    this.highlightedRow.sort();
+    let row = this.highlightedRow[0];
+    for(let i=1; i<this.highlightedRow.length; i++){
+      row += ', ' + this.highlightedRow[i];
+    }
+    this.addInfo.push('hervorgehoben: '+ ((this.highlightedRow.length===0||this.highlightedRow[0]==='')? 'nichts' : row));
 
     const dialogRef = this.dialog.open(DialogComponent, {height: '520px',
                                        width: '30%',
@@ -1212,7 +1217,7 @@ export class PdfComponent implements OnInit {
     }
     this.dataSource=this.filterDataSource();
     this.currentData=this.filterDataSource();
-    this.table.renderRows();
+    this.table.renderRows(); //zwinge Tabelle dazu, Zeilen neu zu laden
   }
 
   //alt: sendet Formular an CouchDB
