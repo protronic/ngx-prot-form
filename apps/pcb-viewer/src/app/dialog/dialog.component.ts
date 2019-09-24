@@ -68,7 +68,7 @@ export class DialogComponent implements OnInit {
         const keys = Object.keys(this.ressourcen[j]);
         for (let k = 0; k < Object.keys(this.ressourcen[j]).length; k++) {
           if (keys[k] !== 'Artikel') {
-            this.comp.push(keys[k] + ': ' + this.ressourcen[j][keys[k]]);
+            this.comp.push(keys[k] + ': ' + (this.ressourcen[j][keys[k]]===null? 'n.A.':this.ressourcen[j][keys[k]]));
           }
         }
         break;

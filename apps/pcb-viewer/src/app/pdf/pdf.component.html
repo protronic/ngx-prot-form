@@ -27,7 +27,7 @@
     </button>
   </mat-menu>
 
-  <mat-checkbox color="primary" class="margin" [checked]="selectMultiple" (change)="changeMultiple()"> Mehrfachselektion </mat-checkbox>
+  <mat-checkbox color="primary" class="margin" [checked]="selectMultiple" [style.font-size]="'medium'" (change)="changeMultiple()"> Mehrfachselektion </mat-checkbox>
 	<button mat-raised-button (click)="clearAll()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin"> löschen </button>
 	<!-- <mat-checkbox [checked]="checkSMD" (change)="changeSMD()" color="primary" class="margin"> show SMD </mat-checkbox>
 	<mat-checkbox [checked]="checkTHT" (change)="changeTHT()" color="primary" class="margin"> show THT </mat-checkbox> -->
@@ -41,13 +41,25 @@
   <button mat-raised-button (click)="next(true)" color="primary" class ="margin" [disabled]="showBot"> Bottom </button>
 
   <span [style.margin]="'15px'"></span>
-  <mat-checkbox [checked]="showInfo" (change)="showInfo=!showInfo"> Infofenster </mat-checkbox>
+  <mat-checkbox [checked]="showInfo" [style.font-size]="'medium'" (change)="showInfo=!showInfo"> Infofenster </mat-checkbox>
 
 
 
 
-  <button mat-raised-button (click)="enter()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin rightButton"> weiter </button>
-  <button mat-raised-button (click)="back()" [style.background-color]="'ForestGreen'" [style.color]="'white'" class="margin rightButton"> zurück </button>
+  <button mat-raised-button
+          (click)="enter()"
+          color="primary"
+          [disabled]=reparatur
+          class="margin rightButton">
+        weiter
+  </button>
+  <button mat-raised-button
+          (click)="back()"
+          color="primary"
+          [disabled]=reparatur
+          class="margin rightButton">
+        zurück
+  </button>
 
 	<mat-divider [style.margin.px]="'5'"></mat-divider>
 
@@ -121,12 +133,12 @@
 			</button>
     </form>
 
-    <form [style.margin.px]="10" #form="ngForm" *ngIf = bestueckung class="column middle">
+    <form [style.margin.px]="10" #form="ngForm" *ngIf ="showTHT||showSMD" class="column middle">
 			<mat-form-field [style.width.px]="400">
 				<input matInput placeholder="Platinennummer" [(ngModel)]="platine" name="Platinennummer" required>
 				<mat-error *ngIf="platine === ''"> Platinennummer benötigt </mat-error>
       </mat-form-field>
-			<button mat-raised-button
+			<button mat-raised-button type="button"
 				(click)="moreInfo()"
 				color="primary"
 				[disabled]="platine===''||(!bestueckung)">
@@ -134,14 +146,14 @@
       </button>
       <mat-divider [style.margin.px]="5"></mat-divider>
       <mat-form-field [style.width.px]="400" [style.margin.px]="10">
-          <input matInput placeholder="Designator" [(ngModel)]="searchedDes" name="Designator">
-        </mat-form-field>
-        <button mat-raised-button
-                (click)="search(searchedDes)"
-                color="primary"
-                [disabled]="searchedDes===''||searchedDes===undefined">
+        <input matInput placeholder="Designator" [(ngModel)]="searchedDes" name="Designator">
+      </mat-form-field>
+      <button mat-raised-button type="button"
+              (click)="search(searchedDes)"
+              color="primary"
+              [disabled]="searchedDes===''||searchedDes===undefined">
         Suchen
-        </button>
+      </button>
     </form>
 
 	</mat-card>

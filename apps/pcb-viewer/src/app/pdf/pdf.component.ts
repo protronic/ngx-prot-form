@@ -5,7 +5,7 @@ import {Component, OnInit, ViewChild, HostListener, Output, EventEmitter, Render
 import {PdfViewerComponent, PDFDocumentProxy, PDFProgressData} from 'ng2-pdf-viewer';
 import {PDFTreeNode} from 'pdfjs-dist';
 import { HttpClient } from '@angular/common/http';
-import {MatDialog, MatDialogConfig, MatTableDataSource} from '@angular/material';
+import {MatDialog, MatDialogConfig, MatTableDataSource, MatTable} from '@angular/material';
 import {MatSort} from '@angular/material/sort';
 import {Sort} from '@angular/material/sort';
 import { ActivatedRoute } from '@angular/router';
@@ -110,7 +110,7 @@ export class PdfComponent implements OnInit {
   platinenNr: string;
   formID: string;
 
-  @ViewChild(MatSort, {static: true}) sort: MatSort;
+  @ViewChild(MatTable, {static:false}) table: MatTable<any>;
 
   //hebt Reihe(n) und Komponente(n) hervor nachdem auf Kopmonente geklickt wurde
   //arbeitet stark mit BackgroundLayer des PDFs und ist auf dessen Beschaffenheit angepasst
@@ -233,7 +233,8 @@ export class PdfComponent implements OnInit {
     }
   }
 
-  constructor(private renderer: Renderer2, private httpService: HttpClient, private dialog: MatDialog, private route: ActivatedRoute, private db_con: DatabaseConnectionService) {
+  constructor(private renderer: Renderer2, private httpService: HttpClient, private dialog: MatDialog, private route: ActivatedRoute,
+              private db_con: DatabaseConnectionService) {
   }
 
   //holt Daten und setzt StandardEinstellungen
@@ -784,7 +785,7 @@ export class PdfComponent implements OnInit {
         for(let j=0; j<liste.length; j++){
           if(currentDes.includes(liste[j])){
             this.highlight(liste[j]+' ');
-            this.highlightedRow.push(liste[j]);
+            if(!this.highlightedRow.includes(liste[j])) this.highlightedRow.push(liste[j]);
           }
         }
         break;
@@ -794,6 +795,7 @@ export class PdfComponent implements OnInit {
 
   //lädt übergebenes Formular
   loadForm(form: Formular){
+    this.clearAll();
     this.currentRow = form.currentRow;
     this.platine = form.platinenNr;
     this.comment = form.comment;
@@ -964,7 +966,7 @@ export class PdfComponent implements OnInit {
     if(this.reparatur&&this.comment!=='') this.addInfo.push('Fehlerbeschreibung: ' + this.comment);
     this.addInfo.push('Seite: ' + (this.pageNr===1 ? 'Top' : 'Bottom'));
     this.addInfo.push('Zeile: ' + (this.currentRow>-1 ? this.currentRow : 'keine'));
-    this.addInfo.push('hervorgehoben: '+ (this.highlightedRow[0]!=='' ? this.highlightedRow.join() : 'nichts'));
+    this.addInfo.push('hervorgehoben: '+ (this.highlightedRow.length!==0? this.highlightedRow.sort().join() : 'nichts'));
 
     const dialogRef = this.dialog.open(DialogComponent, {height: '520px',
                                        width: '30%',
@@ -1094,21 +1096,20 @@ export class PdfComponent implements OnInit {
         }
       }
     }else{
-      if(this.selectMultiple){
-        const placeholder = [];
-        for(let i=0; i<this.highlightedRow.length; i++){
-          if(this.highlightedRow[i]!==des){
-            placeholder.push(this.highlightedRow[i]);
-          }
-        }
-        this.highlightedRow = placeholder;
-        for (let i = 0; i < document.querySelector('.textLayer').querySelectorAll('span').length; i++) {
-          this.renderer.removeStyle(document.querySelector('.textLayer').querySelectorAll('span')[i], 'background-color');
-        }
-        for(let i=0; i<this.highlightedRow.length; i++){
-          this.highlight(this.highlightedRow[i]+' ');
+      const placeholder = [];
+      for(let i=0; i<this.highlightedRow.length; i++){
+        if(this.highlightedRow[i]!==des){
+          placeholder.push(this.highlightedRow[i]);
         }
       }
+      this.highlightedRow = placeholder;
+      for (let i = 0; i < document.querySelector('.textLayer').querySelectorAll('span').length; i++) {
+        this.renderer.removeStyle(document.querySelector('.textLayer').querySelectorAll('span')[i], 'background-color');
+      }
+      for(let i=0; i<this.highlightedRow.length; i++){
+        this.highlight(this.highlightedRow[i]+' ');
+      }
+
 
     }
 
@@ -1200,18 +1201,18 @@ export class PdfComponent implements OnInit {
 
   //sortiert nach bestimmter Spalte
   sortData(sort: Sort) {
-    const data = this.dataSource;
     if(sort.direction === ''){
-      data.sort(function(a, b) {return parseInt(a['pos'], 10)<parseInt(b['pos'], 10) ? -1:1});
+      this.dataSource.sort(function(a, b) {return parseInt(a['pos'], 10)<parseInt(b['pos'], 10) ? -1:1});
     }else{
       const isAsc = sort.direction==='asc';
       switch(sort.active){
-        case 'position': {data.sort(function(a,b) {return (parseInt(a['pos'], 10)<parseInt(b['pos'], 10) ? -1:1)*(isAsc ? 1:-1);}); break;}
-        case 'artikelnummer': data.sort(function(a,b) {return (parseInt(a['art'], 10)<parseInt(b['art'], 10) ? -1:1)*(isAsc ? 1:-1);});
+        case 'position': {this.dataSource.sort(function(a,b) {return (parseInt(a['pos'], 10)<parseInt(b['pos'], 10) ? -1:1)*(isAsc ? 1:-1);}); break;}
+        case 'artikelnummer': this.dataSource.sort(function(a,b) {return (parseInt(a['art'], 10)<parseInt(b['art'], 10) ? -1:1)*(isAsc ? 1:-1);});
       }
     }
-    this.dataSource = data;
+    this.dataSource=this.filterDataSource();
     this.currentData=this.filterDataSource();
+    this.table.renderRows();
   }
 
   //alt: sendet Formular an CouchDB

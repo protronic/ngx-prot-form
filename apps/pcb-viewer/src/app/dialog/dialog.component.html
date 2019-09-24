@@ -5,10 +5,9 @@
 <h2 mat-dialogue-title *ngIf=choose> Modell auswählen </h2>
 <h2 mat-dialogue-title *ngIf=form> Platinen-Nummer eingeben </h2>
 <h2 *ngIf=noForms> Es wurden keine Formulare gefunden </h2>
-<p *ngIf=choose> bitte warten, bis PDF und Tabelle im Hintergrund vollständig geladen sind </p>
 
 <div *ngIf="reparatur||bestueckung||component">
-  <mat-dialog-content class = "content">
+  <mat-dialog-content [style.height.px]="300">
 	  <ul *ngFor="let line of comp">
 		  <li><h3> {{line}} </h3>
 		  </li>
@@ -17,7 +16,7 @@
 </div>
 
 <div *ngIf=choose>
-  <mat-dialog-content class="content">
+  <mat-dialog-content [style.height.px]="340">
     <mat-table [dataSource]=formulare>
       <ng-container matColumnDef="Id">
         <mat-header-cell *matHeaderCellDef> ID </mat-header-cell>
