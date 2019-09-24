@@ -23,7 +23,7 @@ export class DialogComponent implements OnInit {
   comment: string;
   formID: string;
   loginstatus: string;
-  display= ['Id', 'Platine', 'User', 'Art', 'Time'];
+  display= ['Id', 'Platine', 'User', 'Art'];
   headers: string[] = ['Designator', 'Quantity', 'Comment', 'Matchcode', 'Lieferant', 'HArtikelnummer', 'Hersteller', 'Einzelpreis']; // maybe
 
   constructor(private dialogRef: MatDialogRef<DialogComponent>, @Inject(MAT_DIALOG_DATA) data) {
@@ -73,6 +73,8 @@ export class DialogComponent implements OnInit {
         }
         break;
       }
+    }else if(this.art==='Choose'){
+      //evtl Datum umformen
     }
 
   }

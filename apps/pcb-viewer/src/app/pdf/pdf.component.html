@@ -25,6 +25,9 @@
     <button mat-menu-item [style.background-color]="'#455A64'" [style.color]="'white'" (click)="showAttach('PDF')">
       <span> ursprüngliches PDF </span>
     </button>
+    <button mat-menu-item [style.background-color]="'#607D8B'" [style.color]="'white'" (click)="showAttach('Form')">
+      <span> Alle Formulare </span>
+    </button>
   </mat-menu>
 
   <mat-checkbox color="primary" class="margin" [checked]="selectMultiple" [style.font-size]="'medium'" (change)="changeMultiple()"> Mehrfachselektion </mat-checkbox>

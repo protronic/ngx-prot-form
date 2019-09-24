@@ -808,8 +808,8 @@ export class PdfComponent implements OnInit {
     this.bestueckung = form.parentForm === 'Bestückung';
     this.reparatur = form.parentForm !== 'Bestückung';
     this.currentData = this.filterDataSource();
-    this.convertComps(form.changedComps);
-    this.convertRow(form.highlightedRow);
+    if(this.bestueckung) this.convertComps(form.changedComps);
+    if(form.highlightedRow!==null) this.convertRow(form.highlightedRow);
     //highlight Komponenten
     if(!this.hasComps){this.getComps();}
     for(let j=0; j<this.highlightedRow.length; j++){
@@ -820,6 +820,7 @@ export class PdfComponent implements OnInit {
     for (let j = 0; j < this.rows.length; j++) {
       const designator = this.currentData[j]['des'];
       if (this.highlightedRow.includes(designator)) {
+        this.rows[j].parentElement.scrollTop = 0;
         this.rows[j].parentElement.scrollTop = (this.currentRow) * this.rows[j].getBoundingClientRect().height;
         break;
       }
@@ -1185,7 +1186,8 @@ export class PdfComponent implements OnInit {
     let url='';
     switch(id){
       case 'PDF': {url = `http://prot-nas/pdf/altium/${this.bonus_info[0]['Komplettbest_Platine']}/AssemblyDrawings.pdf`; break;}
-      case 'Wiki': url = `http://prot-subuntu:8080/prot-wiki/Wiki.jsp?page=Artikelauskunft&currentNum=${this.article}#section-Artikelauskunft-PCB`;
+      case 'Wiki': {url = `http://prot-subuntu:8080/prot-wiki/Wiki.jsp?page=Artikelauskunft&currentNum=${this.article}#section-Artikelauskunft-PCB`; break;}
+      case 'Form': {url = `http://prot-subuntu:8080/prot-wiki/Wiki.jsp?page=Alle%20Modelle`; break;}
     }
     window.open(url, '_blank');
   }
@@ -1293,10 +1295,6 @@ export class PdfComponent implements OnInit {
 
   //schicke Formular nach Besückung
   submitB(platine: string){
-    const now = new Date();
-    registerLocaleData(localeDe);
-    const pipe = new DatePipe('de');
-    const date = pipe.transform(now, 'medium');
     let comp='';
     if(this.changedComps.length!==0){
       //sortiere nach Designator
@@ -1311,10 +1309,9 @@ export class PdfComponent implements OnInit {
         'Auftragsnummer': this.fertigung[0]['Fertigungsauftragsnummerbc'],
         'Fehlerbeschreibung': '',
         'betrachtete_Komponenten': comp,
-        'Benutzer': this.username,
+        '#changed_by': this.username,
         'Artikelnummer': this.article,
-        'Datum': date,
-        'parentForm': 'Bestückung',
+        '#parentForm': 'Bestückung',
         'currentRow': this.currentRow,
         'highlightedRow': this.highlightedRow,
         'showBoth': this.showBoth,
@@ -1330,10 +1327,6 @@ export class PdfComponent implements OnInit {
 
   //schicke Formular nach Reparatur
   submitR(platine: string, comment: string){
-    const now = new Date();
-    registerLocaleData(localeDe);
-    const pipe = new DatePipe('de');
-    const date = pipe.transform(now, 'medium');
     let comp='';
     if(this.changedComps.length!==0){
       //sortiere nach Designator
@@ -1347,10 +1340,9 @@ export class PdfComponent implements OnInit {
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
         'betrachtete_Komponenten': comp,
-        'Benutzer': this.username,
+        '#changed_by': this.username,
         'Artikelnummer': this.article,
-        'Datum': date,
-        'parentForm': 'Reparatur',
+        '#parentForm': 'Reparatur',
         'currentRow': this.currentRow,
         'highlightedRow': this.highlightedRow,
         'showBoth': this.showBoth,
@@ -1365,10 +1357,6 @@ export class PdfComponent implements OnInit {
   }
 
   update(platine: string, comment: string){
-    const now = new Date();
-    registerLocaleData(localeDe);
-    const pipe = new DatePipe('de');
-    const date = pipe.transform(now, 'medium');
     let comp='';
     if(this.changedComps.length!==0){
       //sortiere nach Designator
@@ -1382,10 +1370,9 @@ export class PdfComponent implements OnInit {
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
         'betrachtete_Komponenten': comp,
-        'Benutzer': this.username,
+        '#changed_by': this.username,
         'Artikelnummer': this.article,
-        'Datum': date,
-        'parentForm': 'Reparatur',
+        '#parentForm': 'Reparatur',
         'currentRow': this.currentRow,
         'highlightedRow': this.highlightedRow,
         'showBoth': this.showBoth,
@@ -1396,7 +1383,6 @@ export class PdfComponent implements OnInit {
         'pageNr': this.pageNr
     };
     this.db_con.update_document(this.formID, item);
-    console.log(this.formID);
   }
 
 }

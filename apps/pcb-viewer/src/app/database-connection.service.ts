@@ -55,10 +55,10 @@ export class DatabaseConnectionService {
         JSON_VALUE(log, '$."currentRow"') AS 'currentRow',
         JSON_QUERY(log, '$."highlightedRow"') AS 'highlightedRow',
         JSON_QUERY(log, '$."betrachtete_Komponenten"') AS 'changedComps',
-        JSON_VALUE(log, '$."parentForm"') AS 'parentForm',
+        JSON_VALUE(log, '$."#parentForm"') AS 'parentForm',
         JSON_VALUE(log, '$."Platinennummer"') AS 'platinenNr',
         JSON_VALUE(log, '$."Fehlerbeschreibung"') AS 'comment',
-        JSON_VALUE(log, '$."Benutzer"') AS 'user',
+        JSON_VALUE(log, '$."#changed_by"') AS 'user',
         log
       FROM
         model
