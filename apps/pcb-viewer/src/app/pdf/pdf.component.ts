@@ -1135,6 +1135,15 @@ export class PdfComponent implements OnInit {
           this.showBot=true;
           this.showTop=false;
         }
+        if(this.bestueckung){
+          if(this.jsonFile[i]['ImportID']==='1'){
+            this.showSMD=true;
+            this.showTHT=false;
+          }else{
+            this.showSMD=false;
+            this.showTHT=true;
+          }
+        }
         this.changeData();
         this.currentData=this.filterDataSource();
         //getting current row
