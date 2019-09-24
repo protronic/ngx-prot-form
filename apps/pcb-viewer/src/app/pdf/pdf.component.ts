@@ -1212,7 +1212,9 @@ export class PdfComponent implements OnInit {
       const isAsc = sort.direction==='asc';
       switch(sort.active){
         case 'position': {this.dataSource.sort(function(a,b) {return (parseInt(a['pos'], 10)<parseInt(b['pos'], 10) ? -1:1)*(isAsc ? 1:-1);}); break;}
-        case 'artikelnummer': this.dataSource.sort(function(a,b) {return (parseInt(a['art'], 10)<parseInt(b['art'], 10) ? -1:1)*(isAsc ? 1:-1);});
+        case 'artikelnummer': {this.dataSource.sort(function(a,b) {return (parseInt(a['art'], 10)<parseInt(b['art'], 10) ? -1:1)*(isAsc ? 1:-1);}); break;}
+        case 'designator': {this.dataSource.sort(function(a,b) {return a['des'].localeCompare(b['des'])*(isAsc ? 1:-1);}); break;}
+        case 'matchcode' : {this.dataSource.sort(function(a,b) {return a['match'].localeCompare(b['match']) *(isAsc ? 1:-1);}); break;}
       }
     }
     this.dataSource=this.filterDataSource();

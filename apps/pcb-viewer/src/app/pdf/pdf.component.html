@@ -86,7 +86,7 @@
   				<div *matCellDef="let item" class="firstColumn"> {{item.pos}} </div>
 			</ng-container>
 			<ng-container matColumnDef="designator">
-  				<mat-header-cell *matHeaderCellDef class="header"> Des. </mat-header-cell>
+  				<mat-header-cell *matHeaderCellDef class="header" mat-sort-header> Des. </mat-header-cell>
   				<mat-cell *matCellDef="let item" (click)="navigateTo(item.des)"> {{item.des}} </mat-cell>
 			</ng-container>
 			<ng-container matColumnDef="artikelnummer">
@@ -94,7 +94,7 @@
   				<mat-cell *matCellDef="let item"> {{item.art}} </mat-cell>
 			</ng-container>
 			<ng-container matColumnDef="matchcode">
-  				<mat-header-cell *matHeaderCellDef class="header"> Matchcode </mat-header-cell>
+  				<mat-header-cell *matHeaderCellDef class="header" mat-sort-header> Matchcode </mat-header-cell>
   				<div *matCellDef="let item" class="matchcode"> {{item.match}} </div>>
 			</ng-container>
 
