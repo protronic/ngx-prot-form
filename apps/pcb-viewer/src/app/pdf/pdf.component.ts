@@ -91,6 +91,7 @@ export class PdfComponent implements OnInit {
   smallDis = false;
   bigDis = false;
   showPDF = false;
+  isLoading = false;
   highlightedRow: Array<string> = [];
   currentRow =-1;
   hasRows = false;
@@ -247,6 +248,7 @@ export class PdfComponent implements OnInit {
           this.username = params.username;
           this.formID = params.model;
           if (this.article !== undefined ) {
+            this.isLoading = true;
             //momentan: für Reparatur als Standard
             //aufgerufen falls keine Nummer übergeben
             this.showBoth = true;
@@ -309,6 +311,7 @@ export class PdfComponent implements OnInit {
                 this.bonus_info = data;
                 this.pdfSrc = `http://prot-nas/pdf/altium/${data[0]['Komplettbest_Platine']}/AssemblyDrawings.pdf`;
                 this.showPDF = true;
+                this.isLoading = false;
               })
 
 
