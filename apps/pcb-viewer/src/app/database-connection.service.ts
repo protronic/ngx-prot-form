@@ -36,6 +36,30 @@ export class DatabaseConnectionService {
     })
    }
 
+   async getErrors(){
+    return fetch('http://prot-subuntu:8081/formly', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({q: `
+      SELECT
+      JSON_VALUE(log, '$."schema"[0]."value"') AS 'commonErrors'
+      FROM
+      [formly].[dbo].[schemadetails]
+      WHERE
+      [_key] = 'Reparatur'
+      `})
+    })
+    .then(data => data.json())
+    .then(data => data.recordset)
+    .catch(err => {
+      console.error(`Tried to get errors but failed.`);
+      console.error(err.message);
+      return [];
+    })
+   }
+
   async get_formular(item_nr: string){
     return fetch('http://prot-subuntu:8081/formly', {
       method: 'POST',
@@ -53,7 +77,7 @@ export class DatabaseConnectionService {
         JSON_VALUE(log, '$."showTHT"') AS 'showTHT',
         JSON_VALUE(log, '$."pageNr"') AS 'pageNr',
         JSON_VALUE(log, '$."currentRow"') AS 'currentRow',
-        JSON_QUERY(log, '$."highlightedRow"') AS 'highlightedRow',
+        JSON_VALUE(log, '$."highlightedRow"') AS 'highlightedRow',
         JSON_QUERY(log, '$."betrachtete_Komponenten"') AS 'changedComps',
         JSON_VALUE(log, '$."#parentForm"') AS 'parentForm',
         JSON_VALUE(log, '$."Platinennummer"') AS 'platinenNr',

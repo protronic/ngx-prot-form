@@ -91,7 +91,7 @@ export class PdfComponent implements OnInit {
   smallDis = false;
   bigDis = false;
   showPDF = false;
-  highlightedRow: Array<string> = [''];
+  highlightedRow: Array<string> = [];
   currentRow =-1;
   hasRows = false;
   rows: NodeListOf<Element>;
@@ -108,7 +108,7 @@ export class PdfComponent implements OnInit {
   addInfo: string[];
   platinenNr: string;
   formID: string;
-  commonErrors= ['Kurzschluss beim Löten', 'nicht gelötet' ,'Bauteil gedreht'];
+  commonErrors = [];
 
   @ViewChild(MatTable, {static:false}) table: MatTable<any>;
 
@@ -280,6 +280,10 @@ export class PdfComponent implements OnInit {
                 }));
               })
 
+            this.db_con.getErrors()
+              .then(data =>{
+                this.commonErrors = data[0]['commonErrors'].split(',');
+              })
 
             // Eingriff:
             this.db_con.get_complete_ressource_list(this.article)
@@ -644,11 +648,9 @@ export class PdfComponent implements OnInit {
   //Hole also Des aus String und füge diese zu Array hinzu
   convertRow(s: string){
     this.highlightedRow = [];
-    const liste = s.split('"');
-    for(let i=1; i<liste.length-1; i++){
-      if(liste[i]!==','){
-        this.highlightedRow.push(liste[i]);
-      }
+    const liste = s.split(',');
+    for(let i=0; i<liste.length; i++){
+      this.highlightedRow.push(liste[i]);
     }
   }
 
@@ -1359,6 +1361,14 @@ export class PdfComponent implements OnInit {
         comp+= ', ' + this.changedComps[i]['des'];
       }
     }
+    let row ='';
+    if(this.highlightedRow.length!==0){
+      this.highlightedRow.sort();
+      row = this.highlightedRow[0];
+      for(let i=1; i<this.highlightedRow.length; i++){
+        row += ', ' + this.highlightedRow[i];
+      }
+    }
     const item = {
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
@@ -1367,7 +1377,7 @@ export class PdfComponent implements OnInit {
         'Artikelnummer': this.article,
         '#parentForm': 'Reparatur',
         'currentRow': this.currentRow,
-        'highlightedRow': this.highlightedRow,
+        'highlightedRow': row,
         'showBoth': this.showBoth,
         'showSMD':this.showSMD,
         'showTHT': this.showTHT,
@@ -1389,6 +1399,14 @@ export class PdfComponent implements OnInit {
         comp+= ', ' + this.changedComps[i]['des'];
       }
     }
+    let row ='';
+    if(this.highlightedRow.length!==0){
+      this.highlightedRow.sort();
+      row = this.highlightedRow[0];
+      for(let i=1; i<this.highlightedRow.length; i++){
+        row += ', ' + this.highlightedRow[i];
+      }
+    }
     const item = {
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
@@ -1397,7 +1415,7 @@ export class PdfComponent implements OnInit {
         'Artikelnummer': this.article,
         '#parentForm': 'Reparatur',
         'currentRow': this.currentRow,
-        'highlightedRow': this.highlightedRow,
+        'highlightedRow': row,
         'showBoth': this.showBoth,
         'showSMD':this.showSMD,
         'showTHT': this.showTHT,
