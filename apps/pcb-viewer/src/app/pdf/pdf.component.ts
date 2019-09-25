@@ -334,7 +334,6 @@ export class PdfComponent implements OnInit {
   addError(error: string){
     if(!this.comment.includes(error)){
       if(this.comment!==''||this.comment!==undefined){
-        console.log(this.comment);
         this.comment = this.comment + '\n' + error + ': ';
       }else{
         this.comment = error + ': ';
