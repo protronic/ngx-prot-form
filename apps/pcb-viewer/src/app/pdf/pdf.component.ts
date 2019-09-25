@@ -284,7 +284,7 @@ export class PdfComponent implements OnInit {
 
             this.db_con.getErrors()
               .then(data =>{
-                this.commonErrors = data[0]['commonErrors'].split(',');
+                this.commonErrors = data[0]['commonErrors'].split(', ');
               })
 
             // Eingriff:
@@ -340,7 +340,7 @@ export class PdfComponent implements OnInit {
  //fügt Error im Textfeld Fehlerbeschreibung hinzu
   addError(error: string){
     if(!this.comment.includes(error)){
-      if(this.comment!==''||this.comment!==undefined){
+      if(this.comment.length>0){
         this.comment = this.comment + '\n' + error + ': ';
       }else{
         this.comment = error + ': ';
