@@ -210,17 +210,18 @@
 	</mat-card>  -->
 
 
-	<mat-card class="column right">
-			<pdf-viewer [src]="pdfSrc"
+
+		<pdf-viewer [src]="pdfSrc"
 						(after-load-complete)="afterLoadComplete($event)"
 						(page-rendered)="pageRendered($event)"
 						[external-link-target]="'blank'"
 						[zoom]=zoom
 						[render-text]="true"
 						[show-all]="false"
-						[page]="pageNr">
-			</pdf-viewer>
-	</mat-card>
+            [page]="pageNr"
+            class="column right">
+		</pdf-viewer>
+
 </div>
 
 

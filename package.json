@@ -28,7 +28,9 @@
     "update:check": "ng update",
     "workspace-schematic": "nx workspace-schematic",
     "dep-graph": "nx dep-graph",
-    "help": "nx help"
+    "help": "nx help",
+    "build-pcb-viewer": "ng build --prod --optimization --output-hashing=none pcb-viewer",
+    "deploy-pcb-viewer": "npm run build-pcb-viewer && ftp-deploy -l ./dist/apps/pcb-viewer -r /var/docker/tomcat/webapps/static/AngularSPA/pcb-viewer -h prot-subuntu -u rseidler"
   },
   "private": true,
   "dependencies": {
@@ -74,6 +76,7 @@
     "jest": "24.1.0",
     "jest-preset-angular": "^7.1.1",
     "prettier": "1.16.4",
+    "sftp-deploy-node": "^1.0.5",
     "ts-jest": "24.0.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",

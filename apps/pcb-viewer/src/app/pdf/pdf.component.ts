@@ -871,99 +871,94 @@ export class PdfComponent implements OnInit {
     let bot3 = 1;
     this.pdf.getOutline()
       .then((outline: any[]) => {
-        //console.log(outline[0])
-        const my_outline: PDFTreeNode[] = outline[0].items[0].items[0].items[0].items;
-        for (let index = 0; index < my_outline.length; index++) {
-          const title = my_outline[index].title;
+        console.log(this.jsonFile);
           for (let i = 0; i < this.jsonFile.length; i++) {
-            const designators: string = this.jsonFile[i]['Designator'];
-              if (designators === title) {
-                const platine: string = this.jsonFile[i]['ImportID'];
-                const side: string = this.jsonFile[i]['Side'];
-                const artNum: string = this.jsonFile[i]['Comment'];
-                let matchCode: string;
-                if (this.showBoth) {
-                  for (let j = 0; j < this.fertigung.length; j++) {
-                    if (this.fertigung[j]['Resnum'] === artNum) {
-                      matchCode = this.fertigung[j]['Matchcode'];
-                      break;
-                    }
-                  }
-                } else if (this.showSMD || this.showTHT) {
-                  for (let j = 0; j < this.fertigung.length; j++) {
-                    if (this.fertigung[j]['RessourceNummer'] === artNum) {
-                      matchCode = this.fertigung[j]['Matchcode'];
-                      break;
-                    }
-                  }
+            const title: string = this.jsonFile[i]['Designator'];
+            const platine: string = this.jsonFile[i]['ImportID'];
+            const side: string = this.jsonFile[i]['Side'];
+            const artNum: string = this.jsonFile[i]['Comment'];
+            let matchCode: string;
+            if (this.showBoth) {
+              for (let j = 0; j < this.fertigung.length; j++) {
+                if (this.fertigung[j]['Resnum'] === artNum) {
+                  matchCode = this.fertigung[j]['Matchcode'];
+                  break;
                 }
-                if (side === 'TopLayer') {
-                  const item = {pos: top3.toString(),
-                                des: title,
-                                art: artNum,
-                                match: matchCode
-                                };
-                  this.outlineTop.push(item);
-                  top3++;
-                } else if (side === 'BottomLayer') {
-                  const item = {pos: bot3.toString(),
-                                des: title,
-                                art: artNum,
-                                match: matchCode
-                                };
-                  this.outlineBot.push(item);
-                  bot3++;
+              }
+            } else if (this.showSMD || this.showTHT) {
+              for (let j = 0; j < this.fertigung.length; j++) {
+                if (this.fertigung[j]['RessourceNummer'] === artNum) {
+                  matchCode = this.fertigung[j]['Matchcode'];
+                  break;
                 }
-                if (!this.showBoth) {
-                  for (let h = 0; h < this.fertigung.length; h++) {
-                    if (artNum === this.fertigung[h]['RessourceNummer']) {
-                      const posi = this.fertigung[h]['Pos'];
-                      if (platine === '1.0' || platine === '1') {
-                        if (side === 'TopLayer') {
-                          const item = {pos: posi,
-                                        des: title,
-                                        art: artNum,
-                                        match: matchCode
-                                        };
-                          this.smdOutlineTop.push(item);
-                          top1++;
-                        } else if (side === 'BottomLayer') {
-                          const item = {pos: posi,
-                                        des: title,
-                                        art: artNum,
-                                        match: matchCode
-                                        };
-                          this.smdOutlineBot.push(item);
-                          bot1++;
-                        }
-                        break;
-                      } else if (platine === '2.0' || platine === '2') {
+              }
+            }
+            if (side === 'TopLayer') {
+              const item = {pos: top3.toString(),
+                            des: title,
+                            art: artNum,
+                            match: matchCode
+                            };
+              this.outlineTop.push(item);
+              top3++;
+            } else if (side === 'BottomLayer') {
+              const item = {pos: bot3.toString(),
+                            des: title,
+                            art: artNum,
+                            match: matchCode
+                            };
+              this.outlineBot.push(item);
+              bot3++;
+            }
+            if (!this.showBoth) {
+              for (let h = 0; h < this.fertigung.length; h++) {
+                if (artNum === this.fertigung[h]['RessourceNummer']) {
+                  const posi = this.fertigung[h]['Pos'];
+                  if (platine === '1.0' || platine === '1') {
+                    if (side === 'TopLayer') {
+                      const item = {pos: posi,
+                                    des: title,
+                                    art: artNum,
+                                    match: matchCode
+                                    };
+                      this.smdOutlineTop.push(item);
+                      top1++;
+                    } else if (side === 'BottomLayer') {
+                      const item = {pos: posi,
+                                    des: title,
+                                    art: artNum,
+                                    match: matchCode
+                                    };
+                      this.smdOutlineBot.push(item);
+                      bot1++;
+                    }
+                    break;
+                  } else if (platine === '2.0' || platine === '2') {
   //                      this.thtOutline.push(array_element);
-                          if (side === 'TopLayer') {
-                            const item = {pos: posi,
-                                          des: title,
-                                          art: artNum,
-                                          match: matchCode
-                                          };
-                            this.thtOutlineTop.push(item);
-                            top2++;
-                          } else if (side === 'BottomLayer') {
-                              const item = {pos: posi,
-                                            des: title,
-                                            art: artNum,
-                                            match: matchCode
-                                            };
-                              this.thtOutlineBot.push(item);
-                              bot2++;
-                          }
-                          break;
-                      }
+                    if (side === 'TopLayer') {
+                      const item = {pos: posi,
+                                    des: title,
+                                    art: artNum,
+                                    match: matchCode
+                                    };
+                      this.thtOutlineTop.push(item);
+                      top2++;
+                    } else if (side === 'BottomLayer') {
+                        const item = {pos: posi,
+                                      des: title,
+                                      art: artNum,
+                                      match: matchCode
+                                      };
+                        this.thtOutlineBot.push(item);
+                        bot2++;
                     }
+                    break;
                   }
                 }
               }
+            }
           }
-        }
+
       }, err => console.error('p6', err))
       ;
     this.smdOutlineTop.sort(function(a, b) {return parseInt(b['pos'], 10) - parseInt(a['pos'], 10); });

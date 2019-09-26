@@ -39,6 +39,7 @@
 .right {
 	width: 70%;
   overflow-x: scroll;
+  overflow-y: scroll;
 	height: 90vh;
 }
 
