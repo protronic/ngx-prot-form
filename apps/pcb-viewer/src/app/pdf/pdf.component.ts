@@ -48,7 +48,7 @@ export interface Formular {
 export class PdfComponent implements OnInit {
   article: string;
   articleName: string;
-  pdfSrc: string;
+  pdfSrc: any;
   pdf: PDFDocumentProxy;
   isLoaded = false;
 
@@ -309,7 +309,8 @@ export class PdfComponent implements OnInit {
                 }));
 
                 this.bonus_info = data;
-                this.pdfSrc = `http://prot-nas/pdf/altium/${data[0]['Komplettbest_Platine']}/AssemblyDrawings.pdf`;
+                this.pdfSrc = {url: `http://prot-nas/pdf/altium/${data[0]['Komplettbest_Platine']}/AssemblyDrawings.pdf`
+                              };
                 this.showPDF = true;
                 this.isLoading = false;
               })
@@ -871,7 +872,6 @@ export class PdfComponent implements OnInit {
     let bot3 = 1;
     this.pdf.getOutline()
       .then((outline: any[]) => {
-        console.log(this.jsonFile);
           for (let i = 0; i < this.jsonFile.length; i++) {
             const title: string = this.jsonFile[i]['Designator'];
             const platine: string = this.jsonFile[i]['ImportID'];
@@ -1328,6 +1328,7 @@ export class PdfComponent implements OnInit {
       }
     }
     const item = {
+        'Artikelname': this.article,
         'Platinennummer': platine,
         'Auftragsnummer': this.fertigung[0]['Fertigungsauftragsnummerbc'],
         'Fehlerbeschreibung': '',
@@ -1368,6 +1369,7 @@ export class PdfComponent implements OnInit {
       }
     }
     const item = {
+        'Artikelname': this.article,
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
         'betrachtete_Komponenten': comp,
@@ -1406,6 +1408,7 @@ export class PdfComponent implements OnInit {
       }
     }
     const item = {
+        'Artikelname': this.article,
         'Platinennummer': platine,
         'Fehlerbeschreibung': comment,
         'betrachtete_Komponenten': comp,
